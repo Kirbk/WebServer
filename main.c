@@ -7,20 +7,16 @@
 #include <sys/socket.h> 
 #include <sys/types.h> 
 #include <signal.h>
+
+#include "config.h"
+#include "http_header.h"
+
 #define MAX 512
 #define MAX_FILE_PATH 512
 #define PORT 80
-#define SA struct sockaddr 
+#define SA struct sockaddr
 
-typedef struct {
-    char* status;
-    char* connection;
-    char* content_type;
-    unsigned int content_length;
-} header_content;
-
-
-void craft_header(char** header, char* code, unsigned int length) {
+void craft_header(char** header, char* code, unsigned int length, char* con) {
     char length_string[100];
     sprintf(length_string, "%d", length);
 
@@ -28,7 +24,9 @@ void craft_header(char** header, char* code, unsigned int length) {
     strcat(head, code);
     strcat(head, "\r\nContent-Length: ");
     strcat(head, length_string);
-    strcat(head, "\r\nConnection: close\r\n\n");
+    strcat(head, "\r\nConnection: ");
+    strcat(head, con);
+    strcat(head, "\r\n\n");
 
     printf("%s\n", head);
 
@@ -55,7 +53,7 @@ void func(int sockfd)
         exit(-1);
     }
     const char delimiter[2] = " ";
-    char serve_file_path[MAX_FILE_PATH] = "./TestWeb";
+    char serve_file_path[MAX_FILE_PATH] = ".";
 
     strtok(loc, delimiter);
     // printf("%s\n", strtok(NULL, delimiter));
@@ -74,11 +72,10 @@ void func(int sockfd)
     FILE* serve;
     if ((serve = fopen(serve_file_path, "rb")) == 0) {
         char* h;
-        craft_header(&h, "404 Not Found", 0);
+        craft_header(&h, "404 Not Found", 0, "keep-alive");
         write(sockfd, h, strlen(h));
 
-        close(sockfd);
-        exit(-1);
+        serve = fopen("./index.html", "rb");
     }
 
     unsigned int file_size;
@@ -87,7 +84,7 @@ void func(int sockfd)
     fseek(serve, 0, SEEK_SET);
 
     char* header;
-    craft_header(&header, "200 OK", file_size);
+    craft_header(&header, "200 OK", file_size, "close");
     // printf("%s\n", header);
     write(sockfd, header, strlen(header));
 
@@ -100,7 +97,6 @@ void func(int sockfd)
     printf("Terminating!\n");
     close(sockfd);
     fclose(serve);
-    exit(0);
 } 
 
 // Driver function 
@@ -109,21 +105,22 @@ int main(int argc, char** argv)
     int port = PORT;
     if (argc == 2) port = atoi(argv[1]);
 
-	int sockfd, connfd, len; 
+	int sockfd, connfd;
+    socklen_t len;
 	struct sockaddr_in servaddr, cli; 
 
 	// socket create and verification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (sockfd == -1) { 
-		printf("socket creation failed...\n"); 
-		exit(0); 
+		fatal("Socket creation failed...\n"); 
+		exit(-1); 
 	} 
 	else
-		printf("Socket successfully created..\n"); 
+		info("Socket successfully created...\n"); 
 	bzero(&servaddr, sizeof(servaddr)); 
 
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
-        fprintf(stderr ,"setsockopt(SO_REUSEADDR) failed");
+        warning("setsockopt(SO_REUSEADDR) failed");
 
 	// assign IP, PORT 
 	servaddr.sin_family = AF_INET; 
@@ -151,15 +148,22 @@ int main(int argc, char** argv)
     while (1) {
         connfd = accept(sockfd, (SA*)&cli, &len);
         if (connfd < 0) { 
-            printf("server acccept failed...\n"); 
-            exit(0); 
+            printf("server acccept failed...\n");
+            perror("Error");
+            connfd = 0;
         } 
-        else
-            printf("server acccept the client...\n"); 
-        
-        if (fork() == 0)
-            func(connfd);
-        else connfd = 0;
+        else {
+            printf("server acccept the client...\n");
+            if (fork() == 0) {
+                func(connfd);
+                printf("Exited Connection\n");
+                exit(0);
+            }
+            else {
+                close(connfd);
+                connfd = 0;
+            }
+        }
     }
 
 	// After chatting close the socket 
