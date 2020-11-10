@@ -301,6 +301,6 @@ void free_request_header(http_request_header** header) {
     if ((p = head->via)) free(p);
     if ((p = head->warning)) free(p);
 
-    free(head);
+    free(header);
     *header = NULL;
 }
