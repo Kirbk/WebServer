@@ -37,10 +37,13 @@ inline void logger(char* msg, int level) {
     switch (level) {
     case 0:
         info(msg);
+        break;
     case 1:
         warning(msg);
+        break;
     case 2:
         fatal(msg);
+        break;
     }
 }
 

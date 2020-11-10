@@ -36,7 +36,7 @@ int process_option(char* option_setting) {
     
     if (strcmp(option, "HomeDir") == 0) // Incorrect directory handled by serving code
         add_option(create_pair(option, &setting, 1));
-    else if (strcmp(option, "RandomPort") == 0) // Invalid port handled by socket code
+    else if (strcmp(option, "RandomPort") == 0)
         add_option(create_pair(option, &setting, 1));
     else if (strcmp(option, "Port") == 0)
         add_option(create_pair(option, &setting, 1));

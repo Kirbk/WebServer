@@ -23,45 +23,58 @@ void send500(int sockfd) {
 }
 
 int dispatch(int sockfd, char* clientip) {
-    int sockets[2];
-    if (pipe(sockets) < 0) {
-        info("Client dropped due to a server error!");
-        system_out();
-        perror("");
+    int loop = 1;
 
-        send500(sockfd);
-        close(sockfd);
-        return(-1);
-    }
+    while (loop) {
+        char buffer[2048];
+        read(sockfd, buffer, sizeof(buffer));
 
+        http_request_header* received = parse_request_header(buffer);
 
-    if (fork()) { // Writer
-        int loop = 1;
-        char fork_buf[1024];
-        close(sockets[1]);
-        while (read(sockets[0], fork_buf, sizeof(fork_buf)) > 0);
-        printf("%s\n", fork_buf);
-        if (strcmp(fork_buf, "NO_LOOP") == 0) loop = 0;
-
-        while (loop) {
-            // Respond and keep alive, maybe change to a do-while loop
+        if (received->connection == CLOSE) {
+            loop = 0;
         }
-    } else { // Reader
-        int loop = 1;
 
-        while (loop) {
-            close(sockets[0]);
-            char buffer[2048];
-            read(sockfd, buffer, sizeof(buffer));
+        // Create response
+        http_response_header response = create_http_response_header();
+        response.connection = received->connection;
 
-            http_request_header* received = parse_request_header(buffer);
+        switch(received->method) {
+        case GET:
+            response.status = "200 OK";
+            break;
+        case HEAD:
 
-            if (received->connection == CLOSE) {
-                write(sockets[1], "NO_LOOP", sizeof("NO_LOOP"));
-                info("fuck");
-                loop = 0;
-            }
+            break;
+        case POST:
+
+            break;
+        case PUT:
+
+            break;
+        case DELETE:
+
+            break;
+        case CONNECT:
+
+            break;
+        case OPTIONS:
+
+            break;
+        case TRACE:
+
+            break;
+        case PATCH:
+
+            break;
         }
+
+        char* header_text;
+        construct_response_header(&header_text, &response); // Test to make sure it actually created it
+
+        launch_and_discard(sockfd, &header_text); // Not sure if it is sending
+
+        free_request_header(&received); // Causing malloc error
     }
 
     info("Client Disconnected!");

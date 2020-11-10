@@ -110,7 +110,7 @@ int configure(char* config_file_name,
 
     option_setting_pair* rand_port;
     if ((rand_port = get_option("RandomPort")) != NULL) { // Intentionally overwrite port option
-        if (strcmp(rand_port->settings[0], "yes")) {
+        if (!strcmp(rand_port->settings[0], "yes")) {
             info("Setting port to random value...");
             srand(time(0));
             *port = (rand() % 65535) + 1;

@@ -243,7 +243,7 @@ int construct_response_header(char** header_text, http_response_header* h) {
 
     if (h->age > 0) {
         char age[10];
-        sprintf(age, "%d", h->content_length);
+        sprintf(age, "%d", h->age);
         add_line_c(2, craft, "Age: ", age); 
     }
 
