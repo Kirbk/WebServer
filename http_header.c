@@ -78,7 +78,7 @@ http_request_header* parse_request_header(char* header_text) {
     header->resource = calloc(strlen(important) + 1, sizeof(char));
     strcpy(header->resource, important);
 
-    printf("%s\n", header->resource);
+    printf("%p\n", header->resource);
     
     important = strtok(NULL, space);
     header->version = calloc(strlen(important) + 1, sizeof(char));
@@ -308,6 +308,6 @@ void free_request_header(http_request_header** header) {
     if ((p = head->via)) free(p);
     if ((p = head->warning)) free(p);
 
-    free(header);
+    free(*header);
     *header = NULL;
 }
