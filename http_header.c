@@ -74,8 +74,15 @@ http_request_header* parse_request_header(char* header_text) {
     for (int i = 0; i < METHOD_TYPES; i++)
         if (!strcmp(top, method_type_strings[i])) header->method = i;
 
-    header->resource = strtok(NULL, space);
-    header->version = strtok(NULL, space);
+    char* important = strtok(NULL, space);
+    header->resource = calloc(strlen(important) + 1, sizeof(char));
+    strcpy(header->resource, important);
+
+    printf("%s\n", header->resource);
+    
+    important = strtok(NULL, space);
+    header->version = calloc(strlen(important) + 1, sizeof(char));
+    strcpy(header->version, important);
 
     for (int i = 1; i < count_lines(header_text); i++) {
         const char sep[3] = ": ";
