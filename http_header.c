@@ -55,6 +55,8 @@ http_request_header* parse_request_header(char* header_text) {
     http_request_header* header = malloc(sizeof(http_request_header));
     memset(header, 0, sizeof(http_request_header));
 
+    info(header_text);
+
     char line_end[strlen(header_text + 1)];
     strcpy(line_end, header_text);
 
@@ -65,7 +67,7 @@ http_request_header* parse_request_header(char* header_text) {
     char* token = strtok(line_end, s);
 
 
-    for (int i = 0; i < count_lines(header_text); i++) {
+    for (int i = 0; i < k; i++) {
         lines[i] = calloc(strlen(token) + 1, sizeof(char));
         strcpy(lines[i], token);
         token = strtok(NULL, s);
