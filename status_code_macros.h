@@ -1,3 +1,6 @@
+#ifndef __STATUS_CODE_MACROS_H__
+#define __STATUS_CODE_MACROS_H__
+
 #define CONTINUE_S                          (100)
 #define SWITCHING_PROTOCOLS_S               (101)
 #define OK_S                                (200)
@@ -40,3 +43,5 @@
 #define GATEWAY_TIME_OUT_S                  (504)
 #define HTTP_VERSION_NOT_SUPPORTED_S        (505)
 #define NETWORK_AUTHENTICATION_REQUIRED_S   (511)
+
+#endif

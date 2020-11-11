@@ -3,12 +3,15 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/select.h>
+#include <ctype.h>
 
 #include "config.h"
 #include "log.h"
 #include "http_header.h"
 #include "status_codes.h"
+#include "content_types.h"
 #include "status_code_macros.h"
+#include "content_type_macros.h"
 
 #define TIME_TO_TIME_OUT            (30)
 #define MAX_DEFAULT_FILE_INDEX      (32)
@@ -60,7 +63,14 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
 
     char resource[sizeof(request_h->resource) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
     memset(resource, 0, sizeof(resource));
-    strcpy(resource, ".");
+    
+    option_setting_pair* home_dir;
+    if ((home_dir = get_option("HomeDir")) != NULL) {
+        strcpy(resource, home_dir->settings[0]);
+    } else {
+        strcpy(resource, ".");
+    }
+
     strcat(resource, request_h->resource); // Make copy to destroy with tokenizing
 
     char* last_i = strrchr(resource, '/');
@@ -81,12 +91,24 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         int size = ftell(serve);
         fseek(serve, 0, SEEK_SET);
 
+        char* extension = strrchr(resource, '.') + 1;
+
+        char* lwr = extension;
+        for ( ; *lwr; ++lwr) *lwr = tolower(*lwr);
+        lwr = NULL;
+
+        char type_buf[32];
+        get_content_type_s(type_buf, extension);
+
+        char* type = malloc(strlen(type_buf) + 1);
+        strcpy(type, type_buf);
+
         get_status_code_s(status, OK_S);
         response_h->status = malloc(strlen(status) + 1);
         strcpy(response_h->status, status);
         response_h->connection = request_h->connection;
         response_h->content_length = size;
-        // response_h->content_type = ;
+        response_h->content_type = type;
 
         *message = malloc(size);
         fread(*message, 1, size, serve);
@@ -111,7 +133,7 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
 }
 
 int post_m(http_request_header* request_h, http_response_header* response_h) {
-
+    return -1;
 }
 
 int dispatch(int sockfd, char* clientip) {
@@ -135,6 +157,7 @@ int dispatch(int sockfd, char* clientip) {
             if (send_timeout(sockfd) == -1) {
                 break;
             }
+            printf("shouldn't be here\n");
         }
 
         read(sockfd, buffer, sizeof(buffer));
@@ -159,25 +182,28 @@ int dispatch(int sockfd, char* clientip) {
             get_m(&message, request, &response);
             break;
         case POST:
-
+            info("POST");
             break;
         case PUT:
-
+            info("PUT");
             break;
         case DELETE:
-
+            info("DELETE");
             break;
         case CONNECT:
-
+            info("CONNECT");
             break;
         case OPTIONS:
-
+            info("OPTIONS");
             break;
         case TRACE:
-
+            info("TRACE");
             break;
         case PATCH:
-
+            info("PATCH");
+            break;
+        case INVALID:
+            send500(sockfd);
             break;
         }
 
@@ -194,7 +220,7 @@ int dispatch(int sockfd, char* clientip) {
         free_request_header(&request);
 
         if (message) {
-            if (!head_set) write(sockfd, message, strlen(message) + 1);
+            if (!head_set) write(sockfd, message, (response.content_length != 0) ? response.content_length : (strlen(message) + 1));
             free(message);
         }
     }

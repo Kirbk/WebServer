@@ -7,15 +7,16 @@
 http_response_header create_http_response_header() {
     http_response_header head = { CLOSE, 
                                 { INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID },
+                                "", // Automatically set DATE field
                                 "",
                                 "",
                                 "",
                                 "",
                                 "",
-                                "",
+                                { 5, 1000 },
                                 -1, 
                                 -1 };
-                                // Automatically set DATE field
+
     return head;
 }
 
@@ -228,6 +229,12 @@ int construct_response_header(char** header_text, http_response_header* h) {
     add_line(craft, h->status);
 
     add_line_c(2, craft, "Connection: ", connection_type_strings[h->connection]);
+
+    if (h->connection == KEEP_ALIVE) {
+        char keep_alive_buf[32];
+        sprintf(keep_alive_buf, "Keep-Alive: time=%d, max=%d", h->keep_alive.timeout, h->keep_alive.max_requests);
+        add_line(craft, keep_alive_buf);
+    }
 
     if (strcmp(h->date, ""))
         add_line_c(2, craft, "Date: : ", h->date);

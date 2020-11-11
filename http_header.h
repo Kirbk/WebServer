@@ -25,6 +25,12 @@ typedef struct {
     char* location; // Redirection
     char* cookie;
     char* download_file;
+
+    struct {
+        int timeout;
+        int max_requests;
+    } keep_alive;
+
     int content_length;
     int age;
 } http_response_header;
