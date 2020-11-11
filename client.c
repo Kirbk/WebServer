@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/select.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "config.h"
 #include "log.h"
@@ -13,7 +14,7 @@
 #include "status_code_macros.h"
 #include "content_type_macros.h"
 
-#define TIME_TO_TIME_OUT            (30)
+#define TIME_TO_TIME_OUT            (5)
 #define MAX_DEFAULT_FILE_INDEX      (32)
 
 int send500(int sockfd) {
@@ -48,6 +49,8 @@ int send_timeout(int sockfd) {
 
     get_status_code_s(error_string, REQUEST_TIME_OUT_S);
     printf("%s\n", error_string);
+
+    h.connection = CLOSE;
 
     return 0; // NOT DONE IDIOT
 }
@@ -140,6 +143,7 @@ int dispatch(int sockfd, char* clientip) {
     int loop = 1;
 
     while (loop) {
+        fatal("Waiting");
         char buffer[2048];
 
         fd_set read_fds, write_fds, except_fds;
@@ -154,10 +158,8 @@ int dispatch(int sockfd, char* clientip) {
         timeout.tv_usec = 0;
 
         if (select(sockfd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) { // This is stupid, should not kill the connection, wrong use of time out
-            if (send_timeout(sockfd) == -1) {
-                break;
-            }
-            printf("shouldn't be here\n");
+            send_timeout(sockfd);
+            break;
         }
 
         read(sockfd, buffer, sizeof(buffer));
@@ -206,6 +208,13 @@ int dispatch(int sockfd, char* clientip) {
             send500(sockfd);
             break;
         }
+
+        char date[50];
+        time_t now = time(0);
+        struct tm tm = *gmtime(&now);
+        strftime(date, sizeof date, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+        printf("%s\n", date);
+        response.date = date;
 
         char* header_text;
         if (construct_response_header(&header_text, &response) < 0) {

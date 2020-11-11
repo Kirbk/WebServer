@@ -207,7 +207,7 @@ int main(int argc, char** argv) {
 		info("Server listening..."); 
 	len = sizeof(cli); 
 
-    while (1) {
+    // while (1) {
         connfd = accept(sockfd, (struct sockaddr*)&cli, &len);
         if (connfd < 0) { 
             if (verbose) {
@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
                 connfd = 0;
             }
         }
-    }
+    // }
 
     close(sockfd);
 }

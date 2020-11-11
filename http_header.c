@@ -237,7 +237,7 @@ int construct_response_header(char** header_text, http_response_header* h) {
     }
 
     if (strcmp(h->date, ""))
-        add_line_c(2, craft, "Date: : ", h->date);
+        add_line_c(2, craft, "Date: ", h->date);
     
     if (strcmp(h->content_type, "")) 
         add_line_c(2, craft, "Content-Type: ", h->content_type);
