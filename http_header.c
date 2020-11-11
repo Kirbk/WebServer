@@ -283,6 +283,7 @@ char* construct_response_header_c(http_response_header* h) {
 int launch_and_discard(int sockfd, char** header) {
     int c = write(sockfd, *header, strlen(*header));
     free(*header);
+    *header = 0;
 
     return c;
 }
