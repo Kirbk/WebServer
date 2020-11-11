@@ -67,7 +67,7 @@ http_request_header* parse_request_header(char* header_text) {
     char* token = strtok(line_end, s);
 
 
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < count_lines(header_text); i++) {
         lines[i] = calloc(strlen(token) + 1, sizeof(char));
         strcpy(lines[i], token);
         token = strtok(NULL, s);
