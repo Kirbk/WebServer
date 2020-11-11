@@ -61,5 +61,10 @@ static http_status get_status_code(int status_number) {
   return http_status_codes[c];
 }
 
+static void get_status_code_s(char* status_buffer, int status_number) {
+  http_status hs = get_status_code(status_number);
+  sprintf(status_buffer, "%d %s", hs.code, hs.msg);
+}
+
 
 #endif

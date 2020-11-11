@@ -7,7 +7,7 @@
 http_response_header create_http_response_header() {
     http_response_header head = { CLOSE, 
                                 { INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID },
-                                0,
+                                "",
                                 "",
                                 "",
                                 "",
@@ -15,6 +15,7 @@ http_response_header create_http_response_header() {
                                 "",
                                 -1, 
                                 -1 };
+                                // Automatically set DATE field
     return head;
 }
 
@@ -78,8 +79,6 @@ http_request_header* parse_request_header(char* header_text) {
     header->resource = calloc(strlen(important) + 1, sizeof(char));
     strcpy(header->resource, important);
 
-    printf("%p\n", header->resource);
-    
     important = strtok(NULL, space);
     header->version = calloc(strlen(important) + 1, sizeof(char));
     strcpy(header->version, important);
@@ -213,15 +212,15 @@ http_request_header* parse_request_header(char* header_text) {
 
 int construct_response_header(char** header_text, http_response_header* h) {
     if (h == NULL) {
-        fprintf(stderr, "Header struct is NULL!");
+        fprintf(stderr, "Header struct is NULL!\n");
         return -1;
     }
     if (header_text == NULL) {
-        fprintf(stderr, "Header text pointer is NULL!");
+        fprintf(stderr, "Header text pointer is NULL!\n");
         return -2;
     }
     if (h->status == NULL || !strcmp(h->status, "")) {
-        fprintf(stderr, "Status is required!");
+        fprintf(stderr, "Status is required!\n");
         return -3;
     }
 
@@ -229,6 +228,9 @@ int construct_response_header(char** header_text, http_response_header* h) {
     add_line(craft, h->status);
 
     add_line_c(2, craft, "Connection: ", connection_type_strings[h->connection]);
+
+    if (strcmp(h->date, ""))
+        add_line_c(2, craft, "Date: : ", h->date);
     
     if (strcmp(h->content_type, "")) 
         add_line_c(2, craft, "Content-Type: ", h->content_type);
@@ -270,11 +272,14 @@ char* construct_response_header_c(http_response_header* h) {
 }
 
 int launch_and_discard(int sockfd, char** header) {
-    write(sockfd, *header, strlen(*header));
+    int c = write(sockfd, *header, strlen(*header));
     free(*header);
+
+    return c;
 }
 
 void free_request_header(http_request_header** header) {
+    if (!(*header)) return;
     http_request_header* head = *header;
     char* p;
     if ((p = head->content_encoding)) free(p);

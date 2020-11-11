@@ -19,7 +19,7 @@ int create_config_file(char* config_file_path) {
     if ((f = fopen(config_file_path, "w")) == NULL)
         return -1;
 
-    char* lines[] = { "HomeDir ./", "Port 80", "RandomPort no" };
+    char* lines[] = { "HomeDir ./", "Port 80", "RandomPort no", "DefaultIndex index.html" };
 
     for (int i = 0; i < (sizeof(lines) / sizeof(char*)); i++) {
         fwrite(lines[i], 1, strlen(lines[i]), f);
@@ -160,6 +160,7 @@ int main(int argc, char** argv) {
             verbose = 1;
         }
     }
+    if (!verbose) freopen("/dev/null", "w", stderr);
 
     int sockfd, connfd;
     socklen_t len;

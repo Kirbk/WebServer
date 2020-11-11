@@ -19,7 +19,7 @@ static char* method_type_strings[] = { "GET", "HEAD", "POST", "PUT", "DELETE", "
 typedef struct {
     connection_type connection;
     method_type allow[9]; // GET, HEAD (Method Not Found Error)
-    int include_date;
+    char* date; // Must be included for http standard.
     char* status; // 200 OK
     char* content_type; // text/html; charset=utf-8
     char* location; // Redirection
