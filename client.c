@@ -48,11 +48,16 @@ int send_timeout(int sockfd) {
     char error_string[20];
 
     get_status_code_s(error_string, REQUEST_TIME_OUT_S);
-    printf("%s\n", error_string);
 
     h.connection = CLOSE;
+    h.status = error_string;
 
-    return 0; // NOT DONE IDIOT
+    char* header;
+    construct_response_header(&header, &h);
+
+    int c = launch_and_discard(sockfd, &header);
+
+    return c;
 }
 
 int check_permission(char* file_path) {
@@ -85,8 +90,6 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         }
     }
 
-    info(resource);
-
     FILE* serve;
     char status[20];
     if (check_permission(resource) && (serve = fopen(resource, "rb")) != NULL) {
@@ -103,6 +106,8 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         char type_buf[32];
         get_content_type_s(type_buf, extension);
 
+        if (strcmp(type_buf, "") == 0) strncpy(type_buf, BYTE_STREAM, sizeof(type_buf));
+
         char* type = malloc(strlen(type_buf) + 1);
         strcpy(type, type_buf);
 
@@ -112,6 +117,9 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         response_h->connection = request_h->connection;
         response_h->content_length = size;
         response_h->content_type = type;
+
+        info_v("Serving file");
+        additional_v(resource);
 
         *message = malloc(size);
         fread(*message, 1, size, serve);
@@ -130,6 +138,7 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         return -1;
     } else {
         // No permission!
+        info("poop");
     }
 
     return 0;
@@ -141,10 +150,13 @@ int post_m(http_request_header* request_h, http_response_header* response_h) {
 
 int dispatch(int sockfd, char* clientip) {
     int loop = 1;
+    char* reason;
+
+    FILE* log_file;
 
     while (loop) {
-        fatal("Waiting");
-        char buffer[2048];
+        char buffer[MAX_HEADER_LENGTH];
+        memset(buffer, 0, MAX_HEADER_LENGTH);
 
         fd_set read_fds, write_fds, except_fds;
         FD_ZERO(&read_fds);
@@ -157,16 +169,25 @@ int dispatch(int sockfd, char* clientip) {
         timeout.tv_sec = TIME_TO_TIME_OUT;
         timeout.tv_usec = 0;
 
-        if (select(sockfd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) { // This is stupid, should not kill the connection, wrong use of time out
+        if (select(sockfd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) {
             send_timeout(sockfd);
+            reason = "Time Out";
             break;
         }
 
-        read(sockfd, buffer, sizeof(buffer));
+        int bytes_read = read(sockfd, buffer, sizeof(buffer));
+        if (bytes_read > MAX_HEADER_LENGTH) {
+            // Header too big!
+        }
 
+        log_file = fopen("log.txt", "a");
+        fwrite(buffer, strlen(buffer), 1, log_file);
+        fwrite("----------------------------------------------------------------------------------------------------\n", 101, 1, log_file);
+        fclose(log_file);
         http_request_header* request = parse_request_header(buffer);
 
         if (request->connection == CLOSE) {
+            reason = "Client Requested";
             loop = 0;
         }
 
@@ -213,17 +234,15 @@ int dispatch(int sockfd, char* clientip) {
         time_t now = time(0);
         struct tm tm = *gmtime(&now);
         strftime(date, sizeof date, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-        printf("%s\n", date);
         response.date = date;
+        response.keep_alive.timeout = TIME_TO_TIME_OUT;
 
         char* header_text;
         if (construct_response_header(&header_text, &response) < 0) {
             send500(sockfd);
+            reason = "Server Error";
             break;
         }
-
-        info(response.status);
-        info(header_text);
 
         launch_and_discard(sockfd, &header_text);
         free_request_header(&request);
@@ -234,8 +253,9 @@ int dispatch(int sockfd, char* clientip) {
         }
     }
 
-    info("Client Disconnected!");
-    additional(clientip);
+    info_v("Client Disconnected!");
+    additional_v(clientip);
+    additional_v(reason);
 
     close(sockfd);
     exit(0);

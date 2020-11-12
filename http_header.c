@@ -55,8 +55,6 @@ http_request_header* parse_request_header(char* header_text) {
     http_request_header* header = malloc(sizeof(http_request_header));
     memset(header, 0, sizeof(http_request_header));
 
-    info(header_text);
-
     char line_end[strlen(header_text + 1)];
     strcpy(line_end, header_text);
 
@@ -283,7 +281,7 @@ char* construct_response_header_c(http_response_header* h) {
 int launch_and_discard(int sockfd, char** header) {
     int c = write(sockfd, *header, strlen(*header));
     free(*header);
-    *header = 0;
+    *header = NULL;
 
     return c;
 }

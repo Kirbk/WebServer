@@ -56,5 +56,11 @@
 #define WEBM            "video/webm"
 #define OGG_V           "video/ogg"
 
+/* Font */
+#define TTF             "font/ttf"
+#define WOFF            "font/woff"
+#define WOFF2           "font/woff2"
+#define EOT             "application/vnd.ms-fontobject"
+#define OTF             "font/otf"
 
 #endif

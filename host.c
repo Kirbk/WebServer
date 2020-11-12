@@ -19,7 +19,7 @@ int create_config_file(char* config_file_path) {
     if ((f = fopen(config_file_path, "w")) == NULL)
         return -1;
 
-    char* lines[] = { "HomeDir ./", "Port 80", "RandomPort no", "DefaultIndex index.html" };
+    char* lines[] = { "HomeDir ./", "Port 80", "RandomPort no", "DefaultIndex index.html", "MaxQueueLength 10" };
 
     for (int i = 0; i < (sizeof(lines) / sizeof(char*)); i++) {
         fwrite(lines[i], 1, strlen(lines[i]), f);
@@ -88,7 +88,8 @@ int find_configuration(char** config_file_name) {
 
 int configure(char* config_file_name, 
               char** home_dir, 
-              int* port) {
+              int* port,
+              int* max_queue_length) {
     
     if (find_configuration(&config_file_name) == -1) return -1;
     if (parse_config_file(config_file_name) == -1) return -1;
@@ -116,9 +117,19 @@ int configure(char* config_file_name,
             *port = (rand() % 65535) + 1;
             
             char buf[6];
-            sprintf(buf, "%d", *port);;
+            sprintf(buf, "%d", *port);
             additional(buf);
         } // Ignore incorrect input
+    }
+
+    option_setting_pair* ql;
+    if ((ql = get_option("MaxQueueLength")) != NULL) {
+        info("Adjusting max queue length");
+        *max_queue_length = atoi(hd->settings[0]);
+        
+        char buf[10];
+        sprintf(buf, "%d", *max_queue_length);
+        additional(buf);
     }
 
     return 0;
@@ -137,8 +148,9 @@ int main(int argc, char** argv) {
     char* home_dir = ".";
     int port = 80;
     int verbose = 0; // Boolean flag
+    int max_queue_length = 10;
 
-    if (configure(config_file_name, &home_dir, &port) < 0) {
+    if (configure(config_file_name, &home_dir, &port, &max_queue_length) < 0) {
         logger("Unable to configure web server! See previous errors.", 2);
         exit(-1);
     }
@@ -169,7 +181,6 @@ int main(int argc, char** argv) {
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         fatal("Unable to create socket!");
         system_out();
-        perror("");
         exit(-1);
     }
 
@@ -179,7 +190,6 @@ int main(int argc, char** argv) {
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
         warning("Weird... Unable to reuse address...");
         system_out();
-        perror("");
         info("Continuing... Could cause bind errors if server restarted on same port\n");
     }
 
@@ -192,14 +202,13 @@ int main(int argc, char** argv) {
 	if ((bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0) { 
 		fatal("Failed to bind to socket!");
         system_out();
-        perror(""); 
 		exit(0);
 	} 
 	else
 		info("Bound to socket..."); 
 
     // Now server is ready to listen and verification 
-	if ((listen(sockfd, 5)) != 0) { 
+	if ((listen(sockfd, max_queue_length)) != 0) { 
 		fatal("Failed to listen!"); 
 		exit(0); 
 	} 
@@ -207,13 +216,12 @@ int main(int argc, char** argv) {
 		info("Server listening..."); 
 	len = sizeof(cli); 
 
-    // while (1) {
+    while (1) {
         connfd = accept(sockfd, (struct sockaddr*)&cli, &len);
         if (connfd < 0) { 
             if (verbose) {
                 info("Client could not be accepted...");
                 system_out();
-                perror("");
             }
 
             connfd = 0;
@@ -225,8 +233,8 @@ int main(int argc, char** argv) {
             char clientip[20];
             strcpy(clientip, inet_ntoa(addr.sin_addr));
 
-            info("Connection Established!");
-            additional(clientip);
+            info_v("Connection Established!");
+            additional_v(clientip);
             if (fork() == 0) {
                 dispatch(connfd, clientip);
             } else {
@@ -234,7 +242,7 @@ int main(int argc, char** argv) {
                 connfd = 0;
             }
         }
-    // }
+    }
 
     close(sockfd);
 }

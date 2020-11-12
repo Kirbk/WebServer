@@ -33,7 +33,8 @@ static const option_setting_pair setting_choices[] = {
     { "HomeDir", anything, 1 },
     { "RandomPort", affirm, 1 },
     { "Port", numeric, 1 },
-    { "DefaultIndex", anything, 1 }
+    { "DefaultIndex", anything, 1 },
+    { "MaxQueueLength", numeric, 1}
 };
 
 int process_option(char* option_setting);

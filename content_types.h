@@ -46,6 +46,13 @@ static const content_type http_content_types[] = {
     { "webm", WEBM },
     { "ogv", OGG_V },
 
+    { "ttf", TTF },
+    { "woff", WOFF },
+    { "woff2", WOFF2 },
+    { "eot", EOT },
+    { "otf", OTF },
+
+
     { "", "" } // Allow looping
 };
 

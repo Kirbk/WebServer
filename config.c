@@ -42,6 +42,8 @@ int process_option(char* option_setting) {
         add_option(create_pair(option, &setting, 1));
     else if (strcmp(option, "DefaultIndex") == 0)
         add_option(create_pair(option, &setting, 1));
+    else if (strcmp(option, "MaxQueueLength") == 0)
+        add_option(create_pair(option, &setting, 1));
     else {
         fprintf(stderr, "%s[WARNING] Option (%s) not valid! Ignoring...%s\n", KYEL, option, DEF);
         memset(option_setting, '\0', sizeof(char) * MAX_LINE_LENGTH);
