@@ -69,7 +69,7 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
     // strcpy(*message, "FUCK");
     // info(*message);
 
-    char resource[sizeof(request_h->resource) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
+    char resource[strlen(request_h->resource) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
     memset(resource, 0, sizeof(resource));
     
     option_setting_pair* home_dir;
@@ -141,6 +141,8 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         info("poop");
     }
 
+    fclose(serve);
+
     return 0;
 }
 
@@ -178,7 +180,7 @@ int dispatch(int sockfd, char* clientip) {
         int bytes_read = read(sockfd, buffer, sizeof(buffer));
         if (bytes_read > MAX_HEADER_LENGTH) {
             // Header too big!
-        }
+        } else if (bytes_read == 0) continue;
 
         log_file = fopen("log.txt", "a");
         fwrite(buffer, strlen(buffer), 1, log_file);

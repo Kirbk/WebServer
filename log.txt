@@ -2118,3 +2118,839 @@ Connection: keep-alive
 Referer: http://localhost/css/bootstrap.min.css
 
 ----------------------------------------------------------------------------------------------------
+GET / HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/bootstrap.min.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/custom.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/jquery-1.11.3.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/bootstrap.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/ie10-viewport-bug-workaround.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pepper.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/jars.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/teapot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/service.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/light_bulb.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/mung_beans.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/coffee_beans_1.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/grapes.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/map.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /favicon.ico HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+GET /images/coffee_beans_1.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+
+----------------------------------------------------------------------------------------------------
+GET /images/mung_beans.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+
+----------------------------------------------------------------------------------------------------
+GET /images/grapes.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+
+----------------------------------------------------------------------------------------------------
+GET /fonts/glyphicons-halflings-regular.woff2 HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: application/font-woff2;q=1.0,application/font-woff;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: identity
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/bootstrap.min.css
+
+----------------------------------------------------------------------------------------------------
+GET /favicon.ico HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+
+----------------------------------------------------------------------------------------------------
+GET / HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/bootstrap.min.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/jquery-1.11.3.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/custom.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/bootstrap.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/ie10-viewport-bug-workaround.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pepper.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/jars.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/teapot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/service.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/light_bulb.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/mung_beans.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/coffee_beans_1.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/grapes.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/map.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET / HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/bootstrap.min.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/custom.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/jquery-1.11.3.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/ie10-viewport-bug-workaround.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/bootstrap.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pepper.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/jars.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/teapot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/service.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/light_bulb.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/mung_beans.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/coffee_beans_1.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/grapes.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/map.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET / HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/bootstrap.min.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /css/custom.css HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/bootstrap.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/ie10-viewport-bug-workaround.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pepper.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/jars.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/pot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/teapot.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/service.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /js/jquery-1.11.3.min.js HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/light_bulb.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/mung_beans.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/coffee_beans_1.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/map.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
+GET /images/grapes.jpg HTTP/1.1
+Host: 10.0.1.201
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:82.0) Gecko/20100101 Firefox/82.0
+Accept: image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+DNT: 1
+Connection: keep-alive
+Referer: http://10.0.1.201/css/custom.css
+Cache-Control: max-age=0
+
+----------------------------------------------------------------------------------------------------
