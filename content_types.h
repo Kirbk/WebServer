@@ -18,6 +18,7 @@ static const content_type http_content_types[] = {
     { "js", JS_TEXT },
     { "txt", PLAIN },
     { "xml", XML },
+    { "php", HTML },
 
     { "jar", JAR },
     { "ogx", OGG_APP },

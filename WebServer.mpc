@@ -1,0 +1,19 @@
+project (ws) {
+  exename = ws
+  install = .
+  libs = sqlite3
+ 
+  specific (make, gnuace) {
+    compile_flags += -g
+    GENFLAGS = 
+    CXXFLAGS = -fsanitize=address
+  }
+
+  Source_Files {
+    client.c
+    config.c
+    host.c
+    http_header.c
+    log.c
+  }
+}

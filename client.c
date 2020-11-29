@@ -13,9 +13,23 @@
 #include "content_types.h"
 #include "status_code_macros.h"
 #include "content_type_macros.h"
+#include "php_wrapper.h"
 
 #define TIME_TO_TIME_OUT            (5)
 #define MAX_DEFAULT_FILE_INDEX      (32)
+
+int get_occurrence_n(char * string, char c, int n) {
+    if (string != NULL) {
+        int occ = 0;
+        for (int i = 0; i < strlen(string); i++) {
+            if (string[i] == c) {
+                if ((++occ) == n) return i;
+            }
+        }
+    }
+
+    return -1;
+}
 
 int send500(int sockfd) {
     char* super_error = "So much of an internal server error, I couldn't find the error page...";
@@ -31,7 +45,7 @@ int send500(int sockfd) {
     h.content_length = strlen(super_error) + 1; // Should be set to size of error page when read, setting it to temp string for now
 
     char* header;
-    construct_response_header(&header, &h);
+    construct_response_header(&header, &h, 0);
 
     int c = launch_and_discard(sockfd, &header);
 
@@ -53,7 +67,7 @@ int send_timeout(int sockfd) {
     h.status = error_string;
 
     char* header;
-    construct_response_header(&header, &h);
+    construct_response_header(&header, &h, 0);
 
     int c = launch_and_discard(sockfd, &header);
 
@@ -64,7 +78,29 @@ int check_permission(char* file_path) {
     return 1; // Obviously temporary, check against config
 }
 
-int get_m(char** message, http_request_header* request_h, http_response_header* response_h) {
+int get_resource(FILE ** goal, char * file_name, char * search_location) {
+    int x = get_occurrence_n(search_location, '/', 3);
+    if (x < 0) return x;
+
+    char resource[strlen(search_location) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
+    memset(resource, 0, sizeof(resource));
+    
+    option_setting_pair* home_dir;
+    if ((home_dir = get_option("HomeDir")) != NULL) {
+        strcpy(resource, home_dir->settings[0]);
+    } else {
+        strcpy(resource, ".");
+    }
+
+    strcat(resource, search_location + x);
+    if (resource[strlen(resource)] != '/') strcat(resource, "/");
+    strcat(resource, file_name);
+
+    *goal = fopen(resource, "rb");
+}
+
+int get_m(char** message, http_request_header* request_h, http_response_header* response_h, int * is_php) {
+    *is_php = 0;
     // *message = calloc(5, sizeof(char));
     // strcpy(*message, "FUCK");
     // info(*message);
@@ -90,9 +126,21 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         }
     }
 
-    FILE* serve;
+    int get = 0;
+    char * get_string;
+    if ((get = get_occurrence_n(resource, '?', 1)) != -1) {
+        get_string = resource + get + 1;
+        *(resource + get) = 0;
+    }
+
+    FILE* serve = fopen(resource, "rb");
     char status[20];
-    if (check_permission(resource) && (serve = fopen(resource, "rb")) != NULL) {
+
+    if (serve == NULL) {
+        get_resource(&serve, resource, request_h->referer);
+    } 
+    
+    if (check_permission(resource) && serve != NULL) {
         fseek(serve, 0, SEEK_END);
         int size = ftell(serve);
         fseek(serve, 0, SEEK_SET);
@@ -102,6 +150,14 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         char* lwr = extension;
         for ( ; *lwr; ++lwr) *lwr = tolower(*lwr);
         lwr = NULL;
+
+        if (strcmp(extension, "php") == 0) {
+            info("Trying to run php");
+            *message = run_script(resource, get_string);
+            // printf("%s\n", *message);
+            size = strlen(*message);
+            *is_php = 1;
+        }
 
         char type_buf[32];
         get_content_type_s(type_buf, extension);
@@ -121,9 +177,13 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         info_v("Serving file");
         additional_v(resource);
 
-        *message = malloc(size);
-        fread(*message, 1, size, serve);
-    } else if (serve == NULL) {
+        if (!(*is_php)) {
+            *message = malloc(size);
+            fread(*message, 1, size, serve);
+        }
+    }else if (serve == NULL) {
+        // Try to find it relative to referer
+
         get_status_code_s(status, NOT_FOUND_S);
         response_h->status = malloc(strlen(status) + 1);
         strcpy(response_h->status, status);
@@ -132,7 +192,7 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
         response_h->content_type = malloc(sizeof("text/html"));
         strcpy(response_h->content_type, "text/html");
 
-        *message = malloc(10);
+        *message = malloc(11);
         strcpy(*message, "404'd lol\n"); // Obviously supply a real (from config) 404 file
 
         return -1;
@@ -152,6 +212,7 @@ int post_m(http_request_header* request_h, http_response_header* response_h) {
 
 int dispatch(int sockfd, char* clientip) {
     int loop = 1;
+    int php = 0;
     char* reason;
 
     FILE* log_file;
@@ -204,7 +265,7 @@ int dispatch(int sockfd, char* clientip) {
         case HEAD:
             head_set = 1;
         case GET:
-            get_m(&message, request, &response);
+            get_m(&message, request, &response, &php);
             break;
         case POST:
             info("POST");
@@ -240,7 +301,7 @@ int dispatch(int sockfd, char* clientip) {
         response.keep_alive.timeout = TIME_TO_TIME_OUT;
 
         char* header_text;
-        if (construct_response_header(&header_text, &response) < 0) {
+        if (construct_response_header(&header_text, &response, php) < 0) {
             send500(sockfd);
             reason = "Server Error";
             break;

@@ -85,9 +85,9 @@ http_request_header* parse_request_header(char* header_text) {
     strcpy(header->version, important);
 
     for (int i = 1; i < count_lines(header_text); i++) {
-        const char sep[3] = ": ";
+        const char sep[2] = ":";
         char* key = strtok(lines[i], sep);
-        char* value = strtok(NULL, sep);
+        char* value = strtok(NULL, "");
 
         if (!strcmp(key, "A-IM")) {
             header->aim = calloc(strlen(value) + 1, sizeof(char));
@@ -208,10 +208,13 @@ http_request_header* parse_request_header(char* header_text) {
         }
     }
 
+    for (int i = 0; i < count_lines(header_text); i++)
+        free(lines[i]);
+
     return header;
 }
 
-int construct_response_header(char** header_text, http_response_header* h) {
+int construct_response_header(char** header_text, http_response_header* h, int is_php) {
     if (h == NULL) {
         fprintf(stderr, "Header struct is NULL!\n");
         return -1;
@@ -239,7 +242,7 @@ int construct_response_header(char** header_text, http_response_header* h) {
     if (strcmp(h->date, ""))
         add_line_c(2, craft, "Date: ", h->date);
     
-    if (strcmp(h->content_type, "")) 
+    if (strcmp(h->content_type, ""))// && !is_php) 
         add_line_c(2, craft, "Content-Type: ", h->content_type);
     
     if (strcmp(h->location, ""))
@@ -263,6 +266,7 @@ int construct_response_header(char** header_text, http_response_header* h) {
         add_line_c(2, craft, "Age: ", age); 
     }
 
+    //if (!is_php) 
     add_line(craft, ""); // Add trailing CRLF
 
     *header_text = calloc(strlen(craft) + 1, sizeof(char));
@@ -272,9 +276,9 @@ int construct_response_header(char** header_text, http_response_header* h) {
     return 0;
 }
 
-char* construct_response_header_c(http_response_header* h) {
+char* construct_response_header_c(http_response_header* h, int is_php) {
     char* header;
-    construct_response_header(&header, h);
+    construct_response_header(&header, h, is_php);
     return header;
 }
 
@@ -290,6 +294,10 @@ void free_request_header(http_request_header** header) {
     if (!(*header)) return;
     http_request_header* head = *header;
     char* p;
+    if ((p = head->accept)) free(p);
+    if ((p = head->accept_language)) free(p);
+    if ((p = head->accept_encoding)) free(p);
+    if ((p = head->cache_control)) free(p);
     if ((p = head->content_encoding)) free(p);
     if ((p = head->content_md5)) free(p);
     if ((p = head->content_type)) free(p);

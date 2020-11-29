@@ -49,6 +49,7 @@ inline void additional_v(char* msg) {
 
 inline void system_out() {
     fprintf(stdout, "%s[System] %s%s", KCYN, strerror(errno), DEF);
+    fprintf(stdout, "\n");
 }
 
 inline void logger(char* msg, int level) {

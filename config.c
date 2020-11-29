@@ -6,7 +6,8 @@
 option_setting_pair* create_pair(char* option, char** settings, int settings_c) {
     option_setting_pair* pair = malloc(sizeof(option_setting_pair));
 
-    pair->option = calloc(strlen(option), sizeof(char));
+    if (strlen(option) == 0) return NULL;
+    pair->option = calloc(strlen(option) + 1, sizeof(char));
     strcpy(pair->option, option);
 
     pair->settings = calloc(settings_c, sizeof(char*));
