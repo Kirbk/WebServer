@@ -1,7 +1,6 @@
 project (ws) {
   exename = ws
   install = .
-  libs = sqlite3
  
   specific (make, gnuace) {
     compile_flags += -g
@@ -15,5 +14,6 @@ project (ws) {
     host.c
     http_header.c
     log.c
+    php_wrapper.c
   }
 }

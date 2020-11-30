@@ -59,6 +59,7 @@ typedef struct {
     char* content_type;
     char* cookie;
     char* date;
+    char* dnt;
     char* expect;
     char* forwarded;
     char* from;
@@ -80,6 +81,7 @@ typedef struct {
     char* transfer_encoding;
     char* user_agent;
     char* upgrade;
+    char* upgrade_insecure;
     char* via;
     char* warning;
 } http_request_header;

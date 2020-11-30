@@ -153,7 +153,7 @@ int get_m(char** message, http_request_header* request_h, http_response_header* 
 
         if (strcmp(extension, "php") == 0) {
             info("Trying to run php");
-            *message = run_script(resource, get_string);
+            *message = run_script(resource, get_string, request_h);
             // printf("%s\n", *message);
             size = strlen(*message);
             *is_php = 1;

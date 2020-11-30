@@ -30,12 +30,12 @@ EXEEXT        =
 LIBPREFIX     = lib
 LIBSUFFIX     = 
 GENFLAGS      = 
-LDLIBS        = -l"sqlite3$(LIBSUFFIX)" -ldl $(subst lib,-l,$(sort $(basename $(notdir $(wildcard /usr/lib/librt.so /lib/librt.so))))) -lpthread
-OBJS          = client$(OBJEXT) config$(OBJEXT) host$(OBJEXT) http_header$(OBJEXT) log$(OBJEXT)
-SRC           = client.c config.c host.c http_header.c log.c
+LDLIBS        = -ldl $(subst lib,-l,$(sort $(basename $(notdir $(wildcard /usr/lib/librt.so /lib/librt.so))))) -lpthread
+OBJS          = client$(OBJEXT) config$(OBJEXT) host$(OBJEXT) http_header$(OBJEXT) log$(OBJEXT) php_wrapper$(OBJEXT)
+SRC           = client.c config.c host.c http_header.c log.c php_wrapper.c
 LINK.cc       = $(LD) $(LDFLAGS)
 EXPORTFLAGS   = 
-DEPLIBS       = $(foreach lib, sqlite3$(LIBSUFFIX) , $(foreach libpath, ., $(wildcard $(libpath)/lib$(lib).a)))
+DEPLIBS       = $(foreach lib, , $(foreach libpath, ., $(wildcard $(libpath)/lib$(lib).a)))
 
 #----------------------------------------------------------------------------
 #       Local targets
@@ -64,6 +64,9 @@ http_header$(OBJEXT): http_header.c
 
 log$(OBJEXT): log.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) log.c
+
+php_wrapper$(OBJEXT): php_wrapper.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) php_wrapper.c
 
 clean:
 	-$(RM) $(OBJS)

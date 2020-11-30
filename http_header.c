@@ -89,6 +89,8 @@ http_request_header* parse_request_header(char* header_text) {
         char* key = strtok(lines[i], sep);
         char* value = strtok(NULL, "");
 
+        value += 1; // Probably stupid dangerous but getting rid of leading space.
+
         if (!strcmp(key, "A-IM")) {
             header->aim = calloc(strlen(value) + 1, sizeof(char));
             strcpy(header->aim, value);
@@ -136,6 +138,9 @@ http_request_header* parse_request_header(char* header_text) {
         } else if (!strcmp(key, "Date")) {
             header->date = calloc(strlen(value) + 1, sizeof(char));
             strcpy(header->date, value);
+        } else if (!strcmp(key, "DNT")) {
+            header->dnt = calloc(strlen(value) + 1, sizeof(char));
+            strcpy(header->dnt, value);
         } else if (!strcmp(key, "Expect")) {
             header->expect = calloc(strlen(value) + 1, sizeof(char));
             strcpy(header->expect, value);
@@ -199,6 +204,9 @@ http_request_header* parse_request_header(char* header_text) {
         } else if (!strcmp(key, "Upgrade")) {
             header->upgrade = calloc(strlen(value) + 1, sizeof(char));
             strcpy(header->upgrade, value);
+        } else if (!strcmp(key, "Upgrade-Insecure-Requests")) {
+            header->upgrade_insecure = calloc(strlen(value) + 1, sizeof(char));
+            strcpy(header->upgrade_insecure, value);
         } else if (!strcmp(key, "Via")) {
             header->via = calloc(strlen(value) + 1, sizeof(char));
             strcpy(header->via, value);
@@ -303,6 +311,7 @@ void free_request_header(http_request_header** header) {
     if ((p = head->content_type)) free(p);
     if ((p = head->cookie)) free(p);
     if ((p = head->date)) free(p);
+    if ((p = head->dnt)) free(p);
     if ((p = head->expect)) free(p);
     if ((p = head->forwarded)) free(p);
     if ((p = head->from)) free(p);
@@ -324,6 +333,7 @@ void free_request_header(http_request_header** header) {
     if ((p = head->trailer)) free(p);
     if ((p = head->transfer_encoding)) free(p);
     if ((p = head->upgrade)) free(p);
+    if ((p = head->upgrade_insecure)) free(p);
     if ((p = head->user_agent)) free(p);
     if ((p = head->version)) free(p);
     if ((p = head->via)) free(p);
