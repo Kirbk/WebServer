@@ -90,7 +90,7 @@ int parse_config_file(char* config_file_name) {
     int comment = 0; // Boolean flag
     while ((c = fgetc(f)) != EOF) {
         if (c == '#') comment = 1;
-        if (c != '\n') {
+        if (c != '\n' && count < MAX_LINE_LENGTH) {
             if (!comment)
                 line[count++] = c;
         }

@@ -7,11 +7,58 @@
 #include <errno.h>
 #include <string.h>
 
-#define ENV_FIELDS (11)
+#include "config.h"
+#include "util.h"
+#include "status_code_macros.h"
+#include "status_codes.h"
+
+#define ENV_FIELDS (18)
+#define MAX_ROOT (2048)
 
 char ** create_environment(char * file_name, char * q_string, http_request_header * header) {
-    char query[strlen(q_string) + 16];
-    sprintf(query, "QUERY_STRING=%s", q_string);
+    char * doc_root;
+    char * root_directory;
+    option_setting_pair* home_directory;
+    if ((home_directory = get_option("HomeDir")) != NULL) {
+        char wor_dir[MAX_ROOT] = { 0 };
+
+        if (home_directory->settings[0][0] == '.') getcwd(wor_dir, MAX_ROOT);
+        
+        if (strcmp(wor_dir, "") == 0) {
+            doc_root = calloc(strlen(home_directory->settings[0]) + 32, sizeof(char));
+            root_directory = calloc(strlen(home_directory->settings[0]) + 1, sizeof(char));
+            strcpy(doc_root, "DOCUMENT_ROOT=");
+            strcat(doc_root, home_directory->settings[0]);
+            strcpy(root_directory, home_directory->settings[0]);
+        }
+        else {
+            doc_root = calloc(strlen(home_directory->settings[0]) + strlen(wor_dir) + 32, sizeof(char));
+            root_directory = calloc(strlen(home_directory->settings[0]) + strlen(wor_dir) + 1, sizeof(char));
+            strcpy(doc_root, "DOCUMENT_ROOT=");
+            strcat(doc_root, wor_dir);
+            strcpy(root_directory, wor_dir);
+        }
+    } else {
+        char cur_dir[MAX_ROOT];
+        doc_root = calloc(MAX_ROOT + 32, sizeof(char));
+        getcwd(cur_dir, MAX_ROOT);
+        
+        strcpy(doc_root, "DOCUMENT_ROOT=");
+        strcat(doc_root, cur_dir);
+    }
+
+    char ** envp = calloc(ENV_FIELDS + 1, sizeof(char *));
+
+    if (q_string) {
+        char query[strlen(q_string) + 16];
+        sprintf(query, "QUERY_STRING=%s", q_string);
+
+        envp[0] = calloc(strlen(query) + 1, sizeof(char));
+        strcpy(envp[0], query);
+    } else {
+        envp[0] = calloc(strlen("QUERY_STRING=") + 1, sizeof(char));
+        strcpy(envp[0], "QUERY_STRING=");
+    }
 
     char script_url[strlen(file_name) + 16];
     sprintf(script_url, "SCRIPT_URL=%s", file_name + 1);
@@ -47,10 +94,39 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     int upgrade_insecure_length = (header->upgrade_insecure) ? strlen(header->upgrade_insecure) + 32 : 32;
     char http_upgrade_insecure[upgrade_insecure_length];
     sprintf(http_upgrade_insecure, "HTTP_UPGRADE_INSECURE_REQUESTS=%s", header->upgrade_insecure);
+    
+    int server_protocol_length = (header->version) ? strlen(header->version) + 32 : 32;
+    char server_protocol[server_protocol_length];
+    sprintf(server_protocol, "SERVER_PROTOCOL=%s", header->version);
+
+    int request_method_length = (header->method) ? strlen(method_type_strings[header->method]) + 32 : 32;
+    char request_method[request_method_length];
+    sprintf(request_method, "REQUEST_METHOD=%s", method_type_strings[header->method]);
+
+    char * s_fn = file_name;
+
+    if (s_fn[0] == '.') {
+        s_fn += 1;
+        if (s_fn[0] == '/') s_fn += 1;
+    }
+
+    int request_uri_length = strlen(s_fn) + 32;
+    char request_uri[request_method_length];
+    sprintf(request_uri, "REQUEST_URI=%s", s_fn);
+
+    int php_self_length = strlen(s_fn) + 32;
+    char php_self[request_method_length];
+    sprintf(php_self, "PHP_SELF=%s", s_fn);
+
+    int script_name_length = strlen(s_fn) + 32;
+    char script_name[request_method_length];
+    sprintf(script_name, "SCRIPT_NAME=%s", s_fn);
+
+    int script_filename_length = strlen(doc_root) + strlen(file_name) + 32;
+    char script_filename[request_method_length];
+    sprintf(script_filename, "SCRIPT_FILENAME=%s/%s", root_directory, s_fn);
 
 
-    char ** envp = calloc(ENV_FIELDS + 1, sizeof(char *));
-    envp[0] = calloc(strlen(query) + 1, sizeof(char));
     envp[1] = calloc(strlen(script_url) + 1, sizeof(char));
     envp[2] = calloc(strlen(http_host) + 1, sizeof(char));
     envp[3] = calloc(strlen(http_user_agent) + 1, sizeof(char));
@@ -60,10 +136,16 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     envp[7] = calloc(strlen(http_dnt) + 1, sizeof(char));
     envp[8] = calloc(strlen(http_connection) + 1, sizeof(char));
     envp[9] = calloc(strlen(http_upgrade_insecure) + 1, sizeof(char));
+    envp[10] = calloc(strlen(server_protocol) + 1, sizeof(char));
+    envp[11] = calloc(strlen(request_method) + 1, sizeof(char));
+    envp[12] = calloc(strlen(request_uri) + 1, sizeof(char));
+    envp[13] = calloc(strlen(php_self) + 1, sizeof(char));
+    envp[14] = calloc(strlen(script_name) + 1, sizeof(char));
+    envp[15] = calloc(strlen(script_filename) + 1, sizeof(char));
+    envp[16] = doc_root;
     envp[ENV_FIELDS - 1] = calloc(1, sizeof(char));
     
 
-    strcpy(envp[0], query);
     strcpy(envp[1], script_url);
     strcpy(envp[2], http_host);
     strcpy(envp[3], http_user_agent);
@@ -73,18 +155,28 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     strcpy(envp[7], http_dnt);
     strcpy(envp[8], http_connection);
     strcpy(envp[9], http_upgrade_insecure);
+    strcpy(envp[10], server_protocol);
+    strcpy(envp[11], request_method);
+    strcpy(envp[12], request_uri);
+    strcpy(envp[13], php_self);
+    strcpy(envp[14], script_name);
+    strcpy(envp[15], script_filename);
     memset(envp[ENV_FIELDS - 1], 0, 1);
+
+
+    free(root_directory);
 
     return envp;
 }
 
-char * run_script(char * file_name, char * q_string, http_request_header * header) {
-    if (file_name == NULL || q_string == NULL || header == NULL) return NULL;
+char * run_script(char * file_name, char * q_string, char * post_data, http_request_header * header, http_response_header * response) {
+    if (file_name == NULL || header == NULL) return NULL;
 
-    char *argv[] = { "/usr/bin/php-cgi", "-f", file_name, 0 };
+    char *argv[] = { "/usr/bin/php-cgi", "-q", "-d", "cgi.force_redirect=0", 0 };
     char ** envp = create_environment(file_name, q_string, header);
 
     int link[2];
+    int err_link[2];
     pid_t pid;
     char foo[4096];
     char * ret_val = NULL;
@@ -92,21 +184,33 @@ char * run_script(char * file_name, char * q_string, http_request_header * heade
 
     if (pipe(link)==-1)
         die("pipe");
+    if (pipe(err_link)==-1)
+        die("pipe");
 
     if ((pid = fork()) == -1)
         die("fork");
 
+    if (post_data)
+        write(link[1], post_data, strlen(post_data));
+
     if(pid == 0) {
-        dup2 (link[1], STDOUT_FILENO);
+        dup2(link[1], STDOUT_FILENO);
+        dup2(link[0], STDIN_FILENO);
+        dup2(err_link[1], STDERR_FILENO);
         close(link[0]);
         close(link[1]);
+        close(err_link[0]);
+        close(err_link[1]);
+
         execve(argv[0], &argv[0], envp);
         perror("");
-        die("execl");
+
+        die("execve");
 
     } else {
 
         close(link[1]);
+        close(err_link[1]);
         int nbytes = 0;
         while ((nbytes = read(link[0], foo, sizeof(foo))) > 0) {
             if (ret_val == NULL) {
@@ -121,13 +225,71 @@ char * run_script(char * file_name, char * q_string, http_request_header * heade
                 strncat(ret_val, foo, nbytes);
             }
         }
+
+        memset(foo, 0, sizeof(foo));
+        nbytes = 0;
+        while ((nbytes = read(err_link[0], foo, sizeof(foo))) > 0) {
+            ret_val = (char*) realloc(ret_val, (ret_size += nbytes));
+            memset(ret_val + ret_size - 1, 0, 1);
+            strncat(ret_val, foo, nbytes);
+        }
+
         memset(ret_val + ret_size - 1, 0, 1);
         wait(NULL);
-    
     }
 
     for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
     if (envp) free(envp);
+
+
+    int cont = (ret_val) ? 1 : 0;
+    int start = 0;
+    int cur = 0;
+    while (cont) {
+        cur = start;
+        while (ret_val[cur] && ret_val[cur] != '\r') {
+            if (ret_val[cur + 1] && ret_val[cur + 1] == '\n') break;
+            cur++;
+            fflush(NULL);
+        }
+
+        if (ret_val[cur + 2] && ret_val[cur + 2] == '\r')
+            if (ret_val[cur + 3] && ret_val[cur + 3] == '\n')
+                cont = 0;
+
+        int token_loc = get_occurrence_n(ret_val + start, ':', 1);
+        if (token_loc > 0) {
+            char key[token_loc + 1];
+            char option[(cur - 1) - token_loc - start];
+
+            memset(key, 0, sizeof(key));
+            memset(option, 0, sizeof(option));
+
+            for (int i = 0; i < sizeof(key) - 1; i++) key[i] = ret_val[start + i];
+            for (int i = 0; i < sizeof(option) - 1; i++) option[i] = ret_val[start + token_loc + i + 2];
+
+            if (strcmp(key, "Status") == 0) {
+                response->status = calloc(strlen(option) + 1, sizeof(char));
+                strcpy(response->status, option);
+            }
+        }
+        
+        start = cur + 2;
+    }
+
+
+    // char * new_line = calloc(strlen(ret_val) + 1, sizeof(char));
+    // char * orig = new_line;
+    // strcpy(new_line, ret_val + cur + 4); // Jump past trailing CRLFs
+    
+    // ret_val = realloc(ret_val, strlen(new_line) + 1);
+    // memset(ret_val, 0, strlen(new_line) + 1);
+    // strncpy(ret_val, new_line, strlen(new_line));
+
+    response->content_length = strlen(ret_val) - cur - 4;
+
+
+    // free(orig);
 
     return ret_val;
 }

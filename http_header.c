@@ -250,7 +250,7 @@ int construct_response_header(char** header_text, http_response_header* h, int i
     if (strcmp(h->date, ""))
         add_line_c(2, craft, "Date: ", h->date);
     
-    if (strcmp(h->content_type, ""))// && !is_php) 
+    if (strcmp(h->content_type, "") && !is_php) 
         add_line_c(2, craft, "Content-Type: ", h->content_type);
     
     if (strcmp(h->location, ""))
@@ -274,8 +274,8 @@ int construct_response_header(char** header_text, http_response_header* h, int i
         add_line_c(2, craft, "Age: ", age); 
     }
 
-    //if (!is_php) 
-    add_line(craft, ""); // Add trailing CRLF
+    if (!is_php)
+        add_line(craft, ""); // Add trailing CRLF
 
     *header_text = calloc(strlen(craft) + 1, sizeof(char));
     memset(*header_text, 0, sizeof(char)); // Clear to be sure
@@ -338,6 +338,7 @@ void free_request_header(http_request_header** header) {
     if ((p = head->version)) free(p);
     if ((p = head->via)) free(p);
     if ((p = head->warning)) free(p);
+    memset(*header, 0, sizeof(http_request_header));
 
     free(*header);
     *header = NULL;

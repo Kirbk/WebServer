@@ -15,5 +15,7 @@ project (ws) {
     http_header.c
     log.c
     php_wrapper.c
+    util.c
+    get.c
   }
 }

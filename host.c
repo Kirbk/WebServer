@@ -125,7 +125,7 @@ int configure(char* config_file_name,
     option_setting_pair* ql;
     if ((ql = get_option("MaxQueueLength")) != NULL) {
         info("Adjusting max queue length");
-        *max_queue_length = atoi(hd->settings[0]);
+        *max_queue_length = atoi(ql->settings[0]);
         
         char buf[10];
         sprintf(buf, "%d", *max_queue_length);
