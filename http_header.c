@@ -7,16 +7,27 @@
 http_response_header create_http_response_header() {
     http_response_header head = { CLOSE, 
                                 { INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID },
-                                "", // Automatically set DATE field
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                { 5, 1000 },
+                                NULL, // Automatically set DATE field
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                NULL,
+                                { 5, 100 },
                                 -1, 
                                 -1 };
 
+    return head;
+}
+
+http_request_header * create_http_request_header() {
+    http_request_header * head = malloc(sizeof(http_request_header));
+    memset(head, 0, sizeof(http_request_header));
+
+    head->connection = CLOSE;
+    head->method = INVALID;
+    head->content_length = -1;
+    
     return head;
 }
 
@@ -52,8 +63,7 @@ int count_lines(char const *str)
 
 
 http_request_header* parse_request_header(char* header_text) {
-    http_request_header* header = malloc(sizeof(http_request_header));
-    memset(header, 0, sizeof(http_request_header));
+    http_request_header* header = create_http_request_header();
 
     char line_end[strlen(header_text + 1)];
     strcpy(line_end, header_text);
@@ -63,7 +73,6 @@ http_request_header* parse_request_header(char* header_text) {
 
     const char s[3] = "\r\n";
     char* token = strtok(line_end, s);
-
 
     for (int i = 0; i < count_lines(header_text); i++) {
         lines[i] = calloc(strlen(token) + 1, sizeof(char));
@@ -219,6 +228,28 @@ http_request_header* parse_request_header(char* header_text) {
     for (int i = 0; i < count_lines(header_text); i++)
         free(lines[i]);
 
+    int cont = (header->method == POST && header->content_length > 0) ? 1 : 0;
+    int start = 0;
+    int cur = 0;
+    while (cont) {
+        cur = start;
+        while (header_text[cur] && header_text[cur] != '\r') {
+            if (header_text[cur + 1] && header_text[cur + 1] == '\n') break;
+            cur++;
+            fflush(NULL);
+        }
+
+        if (header_text[cur + 2] && header_text[cur + 2] == '\r')
+            if (header_text[cur + 3] && header_text[cur + 3] == '\n')
+                cont = 0;
+
+        start = cur + 2;
+    }
+
+    header->content_length = strlen(header_text + cur + 4);
+    header->message = calloc(header->content_length + 1, sizeof(char));
+    strcpy(header->message, header_text + cur + 4);
+
     return header;
 }
 
@@ -247,19 +278,19 @@ int construct_response_header(char** header_text, http_response_header* h, int i
         add_line(craft, keep_alive_buf);
     }
 
-    if (strcmp(h->date, ""))
+    if (h->date)
         add_line_c(2, craft, "Date: ", h->date);
     
-    if (strcmp(h->content_type, "") && !is_php) 
+    if (h->content_type) 
         add_line_c(2, craft, "Content-Type: ", h->content_type);
     
-    if (strcmp(h->location, ""))
+    if (h->location)
         add_line_c(2, craft, "Location: ", h->location);
     
-    if (strcmp(h->cookie, ""))
+    if (h->cookie)
         add_line_c(2, craft, "Set-Cookie: ", h->cookie);
     
-    if (strcmp(h->download_file, ""))
+    if (h->download_file)
         add_line_c(3, craft, "Content-Disposition: attachment; filename=\"", h->download_file, "\"");
 
     if (h->content_length > 0) {
@@ -296,6 +327,18 @@ int launch_and_discard(int sockfd, char** header) {
     *header = NULL;
 
     return c;
+}
+
+void free_response_header(http_response_header * header) {
+    if (!(header)) return;
+
+    char * p;
+    if ((p = header->content_type)) free(p);
+    if ((p = header->cookie)) free(p);
+    if ((p = header->date)) free(p);
+    if ((p = header->download_file)) free(p);
+    if ((p = header->location)) free(p);
+    if ((p = header->status)) free(p);
 }
 
 void free_request_header(http_request_header** header) {
@@ -338,6 +381,7 @@ void free_request_header(http_request_header** header) {
     if ((p = head->version)) free(p);
     if ((p = head->via)) free(p);
     if ((p = head->warning)) free(p);
+    if ((p = head->message)) free(p);
     memset(*header, 0, sizeof(http_request_header));
 
     free(*header);

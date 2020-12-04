@@ -31,8 +31,8 @@ LIBPREFIX     = lib
 LIBSUFFIX     = 
 GENFLAGS      = 
 LDLIBS        = -ldl $(subst lib,-l,$(sort $(basename $(notdir $(wildcard /usr/lib/librt.so /lib/librt.so))))) -lpthread
-OBJS          = client$(OBJEXT) config$(OBJEXT) host$(OBJEXT) http_header$(OBJEXT) log$(OBJEXT) php_wrapper$(OBJEXT) util$(OBJEXT) get$(OBJEXT)
-SRC           = client.c config.c host.c http_header.c log.c php_wrapper.c util.c get.c
+OBJS          = client$(OBJEXT) config$(OBJEXT) host$(OBJEXT) http_header$(OBJEXT) log$(OBJEXT) php_wrapper$(OBJEXT) util$(OBJEXT) get$(OBJEXT) post$(OBJEXT)
+SRC           = client.c config.c host.c http_header.c log.c php_wrapper.c util.c get.c post.c
 LINK.cc       = $(LD) $(LDFLAGS)
 EXPORTFLAGS   = 
 DEPLIBS       = $(foreach lib, , $(foreach libpath, ., $(wildcard $(libpath)/lib$(lib).a)))
@@ -73,6 +73,9 @@ util$(OBJEXT): util.c
 
 get$(OBJEXT): get.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) get.c
+
+post$(OBJEXT): post.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) post.c
 
 clean:
 	-$(RM) $(OBJS)

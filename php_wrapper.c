@@ -12,7 +12,7 @@
 #include "status_code_macros.h"
 #include "status_codes.h"
 
-#define ENV_FIELDS (18)
+#define ENV_FIELDS (22)
 #define MAX_ROOT (2048)
 
 char ** create_environment(char * file_name, char * q_string, http_request_header * header) {
@@ -103,6 +103,10 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     char request_method[request_method_length];
     sprintf(request_method, "REQUEST_METHOD=%s", method_type_strings[header->method]);
 
+    int script_uri_length = strlen(header->host) + strlen(header->resource) + 32;
+    char script_uri[script_uri_length];
+    sprintf(script_uri, "SCRIPT_URI=%s%.*s", header->host, (int)strcspn(header->resource, "?"), header->resource);
+
     char * s_fn = file_name;
 
     if (s_fn[0] == '.') {
@@ -110,21 +114,32 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
         if (s_fn[0] == '/') s_fn += 1;
     }
 
-    int request_uri_length = strlen(s_fn) + 32;
-    char request_uri[request_method_length];
-    sprintf(request_uri, "REQUEST_URI=%s", s_fn);
+    int request_uri_length = strlen(header->resource) + 32;
+    char request_uri[request_uri_length];
+    sprintf(request_uri, "REQUEST_URI=%s", header->resource);
 
     int php_self_length = strlen(s_fn) + 32;
-    char php_self[request_method_length];
-    sprintf(php_self, "PHP_SELF=%s", s_fn);
+    char php_self[php_self_length];
+    sprintf(php_self, "PHP_SELF=/%s", s_fn);
 
     int script_name_length = strlen(s_fn) + 32;
-    char script_name[request_method_length];
-    sprintf(script_name, "SCRIPT_NAME=%s", s_fn);
+    char script_name[script_name_length];
+    sprintf(script_name, "SCRIPT_NAME=/%s", s_fn);
 
     int script_filename_length = strlen(doc_root) + strlen(file_name) + 32;
-    char script_filename[request_method_length];
+    char script_filename[script_filename_length];
     sprintf(script_filename, "SCRIPT_FILENAME=%s/%s", root_directory, s_fn);
+
+    char content_length[128];
+    sprintf(content_length, "CONTENT_LENGTH=%d", (header->method == POST) ? header->content_length : 0);
+
+    int content_type_length = (header->content_type) ? strlen(header->content_type) + 32 : 32;
+    char content_type[content_type_length];
+    sprintf(content_type, "CONTENT_TYPE=%s", (header->content_type) ? header->content_type : "");
+
+    int cookie_length = (header->cookie) ? strlen(header->cookie) + 32 : 32;
+    char cookie[cookie_length];
+    sprintf(cookie, "HTTP_COOKIE=%s", (header->cookie) ? header->cookie : "");
 
 
     envp[1] = calloc(strlen(script_url) + 1, sizeof(char));
@@ -143,6 +158,10 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     envp[14] = calloc(strlen(script_name) + 1, sizeof(char));
     envp[15] = calloc(strlen(script_filename) + 1, sizeof(char));
     envp[16] = doc_root;
+    envp[17] = calloc(strlen(content_length) + 1, sizeof(char));
+    envp[18] = calloc(strlen(content_type) + 1, sizeof(char));
+    envp[19] = calloc(strlen(script_uri) + 1, sizeof(char));
+    envp[20] = calloc(strlen(cookie) + 1, sizeof(char));
     envp[ENV_FIELDS - 1] = calloc(1, sizeof(char));
     
 
@@ -161,6 +180,10 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     strcpy(envp[13], php_self);
     strcpy(envp[14], script_name);
     strcpy(envp[15], script_filename);
+    strcpy(envp[17], content_length);
+    strcpy(envp[18], content_type);
+    strcpy(envp[19], script_uri);
+    strcpy(envp[20], cookie);
     memset(envp[ENV_FIELDS - 1], 0, 1);
 
 
@@ -175,8 +198,15 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
     char *argv[] = { "/usr/bin/php-cgi", "-q", "-d", "cgi.force_redirect=0", 0 };
     char ** envp = create_environment(file_name, q_string, header);
 
+    // int i = 0;
+    // while (envp[i]) printf("%s\n", envp[i++]);
+
+    printf("%d\n", header->content_length);
+    printf("%s\n", post_data);
+
     int link[2];
     int err_link[2];
+    int write_link[2];
     pid_t pid;
     char foo[4096];
     char * ret_val = NULL;
@@ -186,21 +216,23 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
         die("pipe");
     if (pipe(err_link)==-1)
         die("pipe");
+    if (pipe(write_link)==-1)
+        die("pipe");
 
     if ((pid = fork()) == -1)
         die("fork");
 
-    if (post_data)
-        write(link[1], post_data, strlen(post_data));
-
     if(pid == 0) {
-        dup2(link[1], STDOUT_FILENO);
-        dup2(link[0], STDIN_FILENO);
-        dup2(err_link[1], STDERR_FILENO);
         close(link[0]);
-        close(link[1]);
+        close(write_link[1]);
         close(err_link[0]);
+        dup2(write_link[0], STDIN_FILENO);
+        dup2(link[1], STDOUT_FILENO);
+        dup2(err_link[1], STDERR_FILENO);
+        
+        close(link[1]);
         close(err_link[1]);
+        close(write_link[0]);
 
         execve(argv[0], &argv[0], envp);
         perror("");
@@ -208,7 +240,9 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
         die("execve");
 
     } else {
-
+        if (post_data) {
+            write(write_link[1], post_data, strlen(post_data));
+        }
         close(link[1]);
         close(err_link[1]);
         int nbytes = 0;
@@ -240,6 +274,8 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
 
     for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
     if (envp) free(envp);
+
+    // printf("%s\n", ret_val);
 
 
     int cont = (ret_val) ? 1 : 0;

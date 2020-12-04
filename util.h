@@ -6,10 +6,12 @@
 #define TIME_TO_TIME_OUT            (5)
 #define MAX_DEFAULT_FILE_INDEX      (32)
 
+#include "http_header.h"
+
 int get_occurrence_n(char * string, char c, int n);
 int send500(int sockfd);
 int send_timeout(int sockfd);
 int check_permission(char* file_path);
-int get_resource(FILE ** goal, char * file_name, char * search_location);
+int get_resource(char** message, char * post_data, http_request_header* request_h, http_response_header* response_h, int * is_php);
 
 #endif

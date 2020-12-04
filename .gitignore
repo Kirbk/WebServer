@@ -1,5 +1,8 @@
 a.out.dSYM/
 .vscode/
+.frama-c/
 main.c
 index.html
 log.txt
+wordpress/
+*.o

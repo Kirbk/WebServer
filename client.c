@@ -16,10 +16,7 @@
 #include "php_wrapper.h"
 #include "util.h"
 #include "get.h"
-
-int post_m(http_request_header* request_h, http_response_header* response_h) {
-    return -1;
-}
+#include "post.h"
 
 int dispatch(int sockfd, char* clientip) {
     int loop = 1;
@@ -55,9 +52,9 @@ int dispatch(int sockfd, char* clientip) {
         } else if (bytes_read == 0) continue;
 
         log_file = fopen("log.txt", "a");
+        fwrite("\n----------------------------------------------------------------------------------------------------\n", 102, 1, log_file);
         fwrite(buffer, strlen(buffer), 1, log_file);
-        fwrite("\n----------------------------------------------------------------------------------------------------\n", 101, 1, log_file);
-        fclose(log_file);
+        fwrite("\n\n", 2, 1, log_file);
         http_request_header* request = parse_request_header(buffer);
 
         if (request->connection == CLOSE) {
@@ -69,7 +66,7 @@ int dispatch(int sockfd, char* clientip) {
         http_response_header response = create_http_response_header();
         response.connection = request->connection;
 
-        char* message; // malloc the message then delete it.
+        char* message = 0; // malloc the message then delete it.
         int head_set = 0;
 
         switch(request->method) {
@@ -79,7 +76,7 @@ int dispatch(int sockfd, char* clientip) {
             get_m(&message, request, &response, &php);
             break;
         case POST:
-            info("POST");
+            post_m(&message, request, &response, &php);
             break;
         case PUT:
             info("PUT");
@@ -108,7 +105,8 @@ int dispatch(int sockfd, char* clientip) {
         time_t now = time(0);
         struct tm tm = *gmtime(&now);
         strftime(date, sizeof date, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-        response.date = date;
+        response.date = calloc(strlen(date) + 1, sizeof(char));
+        strcpy(response.date, date);
         response.keep_alive.timeout = TIME_TO_TIME_OUT;
 
         char* header_text;
@@ -117,6 +115,12 @@ int dispatch(int sockfd, char* clientip) {
             reason = "Server Error";
             break;
         }
+
+        free_response_header(&response);
+
+        fwrite(header_text, strlen(header_text), 1, log_file);
+        fwrite("----------------------------------------------------------------------------------------------------\n", 101, 1, log_file);
+        fclose(log_file);
 
         launch_and_discard(sockfd, &header_text);
         free_request_header(&request);

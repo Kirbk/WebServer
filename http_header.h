@@ -44,6 +44,8 @@ typedef struct {
     char* resource;
     char* version;
 
+    char* message;
+
     char* aim; // Acceptable instance-manipulations for the request.
     char* accept; // text/html
     char* accept_charset; // utf-8
@@ -91,6 +93,7 @@ void add_line_c(int count, char* base, ...);
 void add_line(char* base, char* added);
 http_request_header* parse_request_header(char* hdr_txt);
 void free_request_header(http_request_header** header);
+void free_response_header(http_response_header* header);
 int construct_response_header(char** header_text, http_response_header* h, int is_php);
 char* construct_response_header_c(http_response_header* h, int is_php);
 int launch_and_discard(int sockfd, char** header);

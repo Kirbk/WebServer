@@ -17,5 +17,6 @@ project (ws) {
     php_wrapper.c
     util.c
     get.c
+    post.c
   }
 }
