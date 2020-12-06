@@ -46,6 +46,11 @@ $conn->close();
     <input type="submit" value="Submit this" />
 </form>
 
+<?php
+echo "<pre>";
+var_dump($_SERVER);
+?>
+
 <?php phpinfo(); ?>
 </body>
 </html>

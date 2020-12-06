@@ -117,7 +117,7 @@ int get_resource(char** message, char * post_data, http_request_header* request_
     char* last_i = strrchr(resource, '/');
     if (last_i == NULL || *(last_i + 1) == '\0' || strrchr(last_i, '.') == NULL) {
         char * get_data_present = strrchr(resource, '?');
-        char * get_data;
+        char * get_data = NULL;
         if (get_data_present) {
             get_data = calloc(strlen(get_data_present) + 1, sizeof(char));
             strcpy(get_data, get_data_present);

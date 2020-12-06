@@ -26,8 +26,7 @@ int dispatch(int sockfd, char* clientip) {
     FILE* log_file;
 
     while (loop) {
-        char buffer[MAX_HEADER_LENGTH];
-        memset(buffer, 0, MAX_HEADER_LENGTH);
+        char buffer[MAX_HEADER_LENGTH] = { 0 };
 
         fd_set read_fds, write_fds, except_fds;
         FD_ZERO(&read_fds);
@@ -45,17 +44,82 @@ int dispatch(int sockfd, char* clientip) {
             reason = "Time Out";
             break;
         }
+        
+        char * req_header_text = NULL;
+        int bytes_read = 0;
+        int ret_size = 0;
+        
+        int x = 0;
 
-        int bytes_read = read(sockfd, buffer, sizeof(buffer));
-        if (bytes_read > MAX_HEADER_LENGTH) {
-            // Header too big!
-        } else if (bytes_read == 0) continue;
+        int buf_ind = 0;
+        int cont = 1;
+        while (cont) {
+            while (buf_ind < MAX_HEADER_LENGTH && 1 == read(sockfd, &buffer[buf_ind], 1)) {
+                if (buf_ind > 2                 && 
+                    '\n' == buffer[buf_ind]     &&
+                    '\r' == buffer[buf_ind - 1] &&
+                    '\n' == buffer[buf_ind - 2] &&
+                    '\r' == buffer[buf_ind - 3])
+                {
+                    cont = 0;
+                    break;
+                }
+                buf_ind++;
+            }
+
+            buf_ind++;
+
+            printf("%d\n", buf_ind);
+            printf("%ld\n", strlen(buffer));
+
+            printf("%s\n", buffer);
+
+            if (req_header_text == NULL) {
+                req_header_text = (char*)malloc(buf_ind * sizeof(char) + 1);
+                memset(req_header_text, 0, buf_ind + 1);
+                strncpy(req_header_text, buffer, buf_ind);
+
+                ret_size = buf_ind + 1;
+            } else {
+                req_header_text = (char*) realloc(req_header_text, (ret_size += buf_ind));
+                memset(req_header_text + ret_size - 1, 0, 1);
+                strncat(req_header_text, buffer, buf_ind);
+            }
+
+
+
+            memset(buffer, 0, MAX_HEADER_LENGTH);
+        }
+
+        // while ((bytes_read = read(sockfd, buffer, sizeof(buffer))) > 0) {
+        //     printf("%d\n", bytes_read);
+        //     if (req_header_text == NULL) {
+        //         req_header_text = (char*)malloc(bytes_read * sizeof(char) + 1);
+        //         memset(req_header_text, 0, bytes_read + 1);
+        //         strncpy(req_header_text, buffer, bytes_read);
+
+        //         ret_size = bytes_read + 1;
+        //     } else {
+        //         req_header_text = (char*) realloc(req_header_text, (ret_size += bytes_read));
+        //         memset(req_header_text + ret_size - 1, 0, 1);
+        //         strncat(req_header_text, buffer, bytes_read);
+        //     }
+
+
+
+        //     memset(buffer, 0, MAX_HEADER_LENGTH);
+
+
+        //     // if (bytes_read < MAX_HEADER_LENGTH) break;
+        // }
 
         log_file = fopen("log.txt", "a");
         fwrite("\n----------------------------------------------------------------------------------------------------\n", 102, 1, log_file);
-        fwrite(buffer, strlen(buffer), 1, log_file);
+        fwrite(req_header_text, strlen(req_header_text), 1, log_file);
         fwrite("\n\n", 2, 1, log_file);
-        http_request_header* request = parse_request_header(buffer);
+        http_request_header* request = parse_request_header(req_header_text);
+
+        free(req_header_text);
 
         if (request->connection == CLOSE) {
             reason = "Client Requested";

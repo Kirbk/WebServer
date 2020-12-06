@@ -6,14 +6,28 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "config.h"
 #include "util.h"
 #include "status_code_macros.h"
 #include "status_codes.h"
 
-#define ENV_FIELDS (22)
+#define ENV_FIELDS (23)
 #define MAX_ROOT (2048)
+
+char * create_env_from_header(key_value_pair kp) {
+    char* lwr = kp.key;
+    for ( ; *lwr; ++lwr) *lwr = toupper(*lwr);
+    lwr = NULL;
+
+    char * ret = calloc(strlen(kp.key) + strlen(kp.value) + 2, sizeof(char));
+    strcpy(ret, kp.key);
+    strcat(ret, "=");
+    strcat(ret, kp.value);
+
+    return ret;
+}
 
 char ** create_environment(char * file_name, char * q_string, http_request_header * header) {
     char * doc_root;
@@ -141,6 +155,22 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     char cookie[cookie_length];
     sprintf(cookie, "HTTP_COOKIE=%s", (header->cookie) ? header->cookie : "");
 
+    int env_length = 21;
+
+
+    int i = 0;
+    if (header->additional) {
+        while (header->additional[i].key != NULL && header->additional[i].value != NULL) {
+            env_length++;
+            char * env_var = create_env_from_header(header->additional[i]);
+            envp = realloc(envp, (env_length + 1) * sizeof(char *));
+
+            envp[env_length - 1] = env_var;
+
+            i++;
+        }
+    }
+
 
     envp[1] = calloc(strlen(script_url) + 1, sizeof(char));
     envp[2] = calloc(strlen(http_host) + 1, sizeof(char));
@@ -162,8 +192,8 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     envp[18] = calloc(strlen(content_type) + 1, sizeof(char));
     envp[19] = calloc(strlen(script_uri) + 1, sizeof(char));
     envp[20] = calloc(strlen(cookie) + 1, sizeof(char));
-    envp[ENV_FIELDS - 1] = calloc(1, sizeof(char));
-    
+
+    envp[env_length] = 0;
 
     strcpy(envp[1], script_url);
     strcpy(envp[2], http_host);
@@ -184,7 +214,6 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     strcpy(envp[18], content_type);
     strcpy(envp[19], script_uri);
     strcpy(envp[20], cookie);
-    memset(envp[ENV_FIELDS - 1], 0, 1);
 
 
     free(root_directory);
@@ -200,9 +229,6 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
 
     // int i = 0;
     // while (envp[i]) printf("%s\n", envp[i++]);
-
-    printf("%d\n", header->content_length);
-    printf("%s\n", post_data);
 
     int link[2];
     int err_link[2];
@@ -275,8 +301,6 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
     for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
     if (envp) free(envp);
 
-    // printf("%s\n", ret_val);
-
 
     int cont = (ret_val) ? 1 : 0;
     int start = 0;
@@ -286,7 +310,6 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
         while (ret_val[cur] && ret_val[cur] != '\r') {
             if (ret_val[cur + 1] && ret_val[cur + 1] == '\n') break;
             cur++;
-            fflush(NULL);
         }
 
         if (ret_val[cur + 2] && ret_val[cur + 2] == '\r')
@@ -322,7 +345,7 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
     // memset(ret_val, 0, strlen(new_line) + 1);
     // strncpy(ret_val, new_line, strlen(new_line));
 
-    response->content_length = strlen(ret_val) - cur - 4;
+    response->content_length = strlen(ret_val) - cur - 5;
 
 
     // free(orig);

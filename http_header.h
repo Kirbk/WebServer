@@ -17,6 +17,11 @@ static char* connection_type_strings[] = { "close", "keep-alive" };
 static char* method_type_strings[] = { "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH" };
 
 typedef struct {
+    char * key;
+    char * value;
+} key_value_pair;
+
+typedef struct {
     connection_type connection;
     method_type allow[9]; // GET, HEAD (Method Not Found Error)
     char* date; // Must be included for http standard.
@@ -86,6 +91,8 @@ typedef struct {
     char* upgrade_insecure;
     char* via;
     char* warning;
+
+    key_value_pair * additional;
 } http_request_header;
 
 http_response_header create_http_response_header();
