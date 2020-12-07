@@ -44,7 +44,7 @@ typedef struct {
     connection_type connection;
     method_type method;
 
-    unsigned int content_length;
+    long content_length;
 
     char* resource;
     char* version;

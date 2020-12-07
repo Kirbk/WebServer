@@ -287,29 +287,23 @@ http_request_header * parse_request_header(char * header_text) {
         current++;
     }
 
-    int cont = (header->method == POST && header->content_length > 0) ? 1 : 0;
-    int start = 0;
-    int cur = 0;
-    while (cont) {
-        cur = start;
-        while (header_text[cur] && header_text[cur] != '\r') {
-            if (header_text[cur + 1] && header_text[cur + 1] == '\n') break;
-            cur++;
-            fflush(NULL);
-        }
+    // int cont = (header->method == POST && header->content_length > 0) ? 1 : 0;
+    // int start = 0;
+    // int cur = 0;
+    // while (cont) {
+    //     cur = start;
+    //     while (header_text[cur] && header_text[cur] != '\r') {
+    //         if (header_text[cur + 1] && header_text[cur + 1] == '\n') break;
+    //         cur++;
+    //         fflush(NULL);
+    //     }
 
-        if (header_text[cur + 2] && header_text[cur + 2] == '\r')
-            if (header_text[cur + 3] && header_text[cur + 3] == '\n')
-                cont = 0;
+    //     if (header_text[cur + 2] && header_text[cur + 2] == '\r')
+    //         if (header_text[cur + 3] && header_text[cur + 3] == '\n')
+    //             cont = 0;
 
-        start = cur + 2;
-    }
-
-    if (header->method == POST && header->content_length > 0) {
-        if (!header->content_length) header->content_length = strlen(header_text + cur + 4);
-        header->message = calloc(header->content_length + 1, sizeof(char));
-        strncpy(header->message, header_text + cur + 4, header->content_length);
-    }
+    //     start = cur + 2;
+    // }
 
     return header;
 }

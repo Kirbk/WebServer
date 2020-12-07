@@ -12,6 +12,7 @@
 #include "util.h"
 #include "status_code_macros.h"
 #include "status_codes.h"
+#include "log.h"
 
 #define ENV_FIELDS (23)
 #define MAX_ROOT (2048)
@@ -145,7 +146,7 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     sprintf(script_filename, "SCRIPT_FILENAME=%s/%s", root_directory, s_fn);
 
     char content_length[128];
-    sprintf(content_length, "CONTENT_LENGTH=%d", (header->method == POST) ? header->content_length : 0);
+    sprintf(content_length, "CONTENT_LENGTH=%ld", (header->method == POST) ? header->content_length : 0);
 
     int content_type_length = (header->content_type) ? strlen(header->content_type) + 32 : 32;
     char content_type[content_type_length];
@@ -271,8 +272,23 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
         }
         close(link[1]);
         close(err_link[1]);
+
+        fd_set read_fds, write_fds, except_fds;
+        FD_ZERO(&read_fds);
+        FD_ZERO(&write_fds);
+        FD_ZERO(&except_fds);
+        FD_SET(link[0], &read_fds);
+
+        // Set timeout to 1.0 seconds
+        struct timeval timeout;
+        timeout.tv_sec = TIME_TO_TIME_OUT;
+        timeout.tv_usec = 0;
+
         int nbytes = 0;
-        while ((nbytes = read(link[0], foo, sizeof(foo))) > 0) {
+        int leave = 0;
+        if (select(link[0] + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1)
+            leave = 1;
+        while (!leave && (nbytes = read(link[0], foo, sizeof(foo))) > 0) {
             if (ret_val == NULL) {
                 ret_val = (char*)malloc(nbytes * sizeof(char) + 1);
                 memset(ret_val, 0, nbytes + 1);
@@ -284,10 +300,30 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
                 memset(ret_val + ret_size - 1, 0, 1);
                 strncat(ret_val, foo, nbytes);
             }
+
+            if (select(link[0] + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) {
+                if (ret_val) free(ret_val);
+                ret_val = NULL;
+                leave = 1;
+                break;
+            }
+        }
+
+        if (leave) {
+            warning_v("PHP read timeout.");
+            leave = 1;
+
+            kill(pid, SIGKILL);
+            
+            for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
+            if (envp) free(envp);
+
+            return NULL;
         }
 
         memset(foo, 0, sizeof(foo));
         nbytes = 0;
+
         while ((nbytes = read(err_link[0], foo, sizeof(foo))) > 0) {
             ret_val = (char*) realloc(ret_val, (ret_size += nbytes));
             memset(ret_val + ret_size - 1, 0, 1);
@@ -295,57 +331,51 @@ char * run_script(char * file_name, char * q_string, char * post_data, http_requ
         }
 
         memset(ret_val + ret_size - 1, 0, 1);
-        wait(NULL);
     }
 
-    for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
-    if (envp) free(envp);
 
-
-    int cont = (ret_val) ? 1 : 0;
-    int start = 0;
-    int cur = 0;
-    while (cont) {
-        cur = start;
-        while (ret_val[cur] && ret_val[cur] != '\r') {
-            if (ret_val[cur + 1] && ret_val[cur + 1] == '\n') break;
-            cur++;
-        }
-
-        if (ret_val[cur + 2] && ret_val[cur + 2] == '\r')
-            if (ret_val[cur + 3] && ret_val[cur + 3] == '\n')
-                cont = 0;
-
-        int token_loc = get_occurrence_n(ret_val + start, ':', 1);
-        if (token_loc > 0) {
-            char key[token_loc + 1];
-            char option[(cur - 1) - token_loc - start];
-
-            memset(key, 0, sizeof(key));
-            memset(option, 0, sizeof(option));
-
-            for (int i = 0; i < sizeof(key) - 1; i++) key[i] = ret_val[start + i];
-            for (int i = 0; i < sizeof(option) - 1; i++) option[i] = ret_val[start + token_loc + i + 2];
-
-            if (strcmp(key, "Status") == 0) {
-                response->status = calloc(strlen(option) + 1, sizeof(char));
-                strcpy(response->status, option);
+    if (ret_val) {
+        int cont = (ret_val) ? 1 : 0;
+        int start = 0;
+        int cur = 0;
+        while (cont) {
+            cur = start;
+            while (ret_val[cur] && ret_val[cur] != '\r') {
+                if (ret_val[cur + 1] && ret_val[cur + 1] == '\n') break;
+                cur++;
             }
+
+            if (ret_val[cur + 2] && ret_val[cur + 2] == '\r')
+                if (ret_val[cur + 3] && ret_val[cur + 3] == '\n')
+                    cont = 0;
+
+            int token_loc = get_occurrence_n(ret_val + start, ':', 1);
+            if (token_loc > 0) {
+                char key[token_loc + 1];
+                char option[(cur - 1) - token_loc - start];
+
+                memset(key, 0, sizeof(key));
+                memset(option, 0, sizeof(option));
+
+                for (int i = 0; i < sizeof(key) - 1; i++) key[i] = ret_val[start + i];
+                for (int i = 0; i < sizeof(option) - 1; i++) option[i] = ret_val[start + token_loc + i + 2];
+
+                if (strcmp(key, "Status") == 0) {
+                    response->status = calloc(strlen(option) + 1, sizeof(char));
+                    strcpy(response->status, option);
+                }
+            }
+            
+            start = cur + 2;
         }
-        
-        start = cur + 2;
+
+        response->content_length = strlen(ret_val) - cur - 4;
     }
 
-
-    // char * new_line = calloc(strlen(ret_val) + 1, sizeof(char));
-    // char * orig = new_line;
-    // strcpy(new_line, ret_val + cur + 4); // Jump past trailing CRLFs
-    
-    // ret_val = realloc(ret_val, strlen(new_line) + 1);
-    // memset(ret_val, 0, strlen(new_line) + 1);
-    // strncpy(ret_val, new_line, strlen(new_line));
-
-    response->content_length = strlen(ret_val) - cur - 5;
+    int i = 0;
+    while (envp[i] != NULL) free(envp[i++]);
+    // for (int i = 0; i < ENV_FIELDS; ++i) if (envp[i]) free(envp[i]);
+    if (envp) free(envp);
 
 
     // free(orig);

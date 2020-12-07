@@ -38,6 +38,7 @@ int send500(int sockfd) {
     h.connection = CLOSE;
     h.status = error_string;
     h.content_length = strlen(super_error) + 1; // Should be set to size of error page when read, setting it to temp string for now
+    h.content_type = HTML;
 
     char* header;
     construct_response_header(&header, &h, 0);
@@ -167,6 +168,16 @@ int get_resource(char** message, char * post_data, http_request_header* request_
         if (strcmp(extension, "php") == 0) {
             info("Trying to run php");
             *message = run_script(resource, get_string, post_data, request_h, response_h);
+            if (*message == NULL) {
+                if (response_h->status) free(response_h->status);
+                get_status_code_s(status, INTERNAL_SERVER_ERROR_S);
+                response_h->status = malloc(strlen(status) + 1);
+                strcpy(response_h->status, status);
+
+                response_h->connection = CLOSE;
+
+                return INTERNAL_SERVER_ERROR_S;
+            }
             *is_php = 1;
         }
 

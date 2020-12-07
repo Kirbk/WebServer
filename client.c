@@ -69,11 +69,6 @@ int dispatch(int sockfd, char* clientip) {
 
             buf_ind++;
 
-            printf("%d\n", buf_ind);
-            printf("%ld\n", strlen(buffer));
-
-            printf("%s\n", buffer);
-
             if (req_header_text == NULL) {
                 req_header_text = (char*)malloc(buf_ind * sizeof(char) + 1);
                 memset(req_header_text, 0, buf_ind + 1);
@@ -86,38 +81,38 @@ int dispatch(int sockfd, char* clientip) {
                 strncat(req_header_text, buffer, buf_ind);
             }
 
-
-
             memset(buffer, 0, MAX_HEADER_LENGTH);
         }
-
-        // while ((bytes_read = read(sockfd, buffer, sizeof(buffer))) > 0) {
-        //     printf("%d\n", bytes_read);
-        //     if (req_header_text == NULL) {
-        //         req_header_text = (char*)malloc(bytes_read * sizeof(char) + 1);
-        //         memset(req_header_text, 0, bytes_read + 1);
-        //         strncpy(req_header_text, buffer, bytes_read);
-
-        //         ret_size = bytes_read + 1;
-        //     } else {
-        //         req_header_text = (char*) realloc(req_header_text, (ret_size += bytes_read));
-        //         memset(req_header_text + ret_size - 1, 0, 1);
-        //         strncat(req_header_text, buffer, bytes_read);
-        //     }
-
-
-
-        //     memset(buffer, 0, MAX_HEADER_LENGTH);
-
-
-        //     // if (bytes_read < MAX_HEADER_LENGTH) break;
-        // }
 
         log_file = fopen("log.txt", "a");
         fwrite("\n----------------------------------------------------------------------------------------------------\n", 102, 1, log_file);
         fwrite(req_header_text, strlen(req_header_text), 1, log_file);
-        fwrite("\n\n", 2, 1, log_file);
+        fwrite("\n", 1, 1, log_file);
         http_request_header* request = parse_request_header(req_header_text);
+
+        if (request->content_length > 0) {
+            FD_ZERO(&read_fds);
+            FD_ZERO(&write_fds);
+            FD_ZERO(&except_fds);
+            FD_SET(sockfd, &read_fds);
+
+            int bytes_read = 0;
+            request->message = calloc(request->content_length + 1, sizeof(char));
+            int x = 0;
+            while ((bytes_read += read(sockfd, buffer, sizeof(buffer) - 1)) <= request->content_length && bytes_read > 0) {
+                // if (strcmp(request->message, "") == 0) strcpy(request->message, buffer);
+                strncat(request->message, buffer, bytes_read);
+                if (bytes_read == request->content_length) break;
+
+                if (select(sockfd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1 ||
+                    bytes_read > request->content_length) {
+                    warning_v("Content length incorrect!");
+                    break;
+                }
+
+                memset(buffer, 0, sizeof(buffer));
+            }
+        }
 
         free(req_header_text);
 
@@ -132,15 +127,16 @@ int dispatch(int sockfd, char* clientip) {
 
         char* message = 0; // malloc the message then delete it.
         int head_set = 0;
+        int ret = 0;
 
         switch(request->method) {
         case HEAD:
             head_set = 1;
         case GET:
-            get_m(&message, request, &response, &php);
+            ret = get_m(&message, request, &response, &php);
             break;
         case POST:
-            post_m(&message, request, &response, &php);
+            ret = post_m(&message, request, &response, &php);
             break;
         case PUT:
             info("PUT");
@@ -162,6 +158,12 @@ int dispatch(int sockfd, char* clientip) {
             break;
         case INVALID:
             send500(sockfd);
+            break;
+        }
+
+        if (ret < 0) {
+            send500(sockfd);
+            reason = "Server Error";
             break;
         }
 

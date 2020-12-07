@@ -20,12 +20,9 @@
 int get_m(char** message, http_request_header* request_h, http_response_header* response_h, int * is_php) {
     int ret = get_resource(message, NULL, request_h, response_h, is_php);
 
-    if (ret == NOT_FOUND_S) {
-        if ((*message) == NULL) {
-            
-        } else {
-            return -1;
-        }
+    if (ret == INTERNAL_SERVER_ERROR_S) {
+        // *message === error page from config.
+        return -1;
     }
 
     return 0;
