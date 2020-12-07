@@ -13,5 +13,6 @@ int send500(int sockfd);
 int send_timeout(int sockfd);
 int check_permission(char* file_path);
 int get_resource(char** message, char * post_data, http_request_header* request_h, http_response_header* response_h, int * is_php);
+int get_error_page(char ** message, int error, http_request_header* request_h, http_response_header* response_h);
 
 #endif

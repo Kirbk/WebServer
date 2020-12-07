@@ -71,7 +71,7 @@ int send_timeout(int sockfd) {
 }
 
 int check_permission(char* file_path) {
-    return 1; // Obviously temporary, check against config
+    return 0; // Obviously temporary, check against config
 }
 
 int get_resource_h(FILE ** goal, char * file_name, char * search_location) {
@@ -230,4 +230,29 @@ int get_resource(char** message, char * post_data, http_request_header* request_
     fclose(serve);
 
     return OK_S;
+}
+
+int get_error_page(char ** message, int error, http_request_header* request_h, http_response_header* response_h) {
+    // Find .htaccess esque file in request directory
+    // -> If ErrorDocument defined for error number, return that message
+    // -> Else continue
+    // If ErrorDocument for error number has been specificed in global config, return that message
+    // Else return default error page
+
+    char error_msg[500];
+    char status[30];
+    if (message && *message == NULL) {
+        sprintf(error_msg, "OOOOOOOOOOPS: %d", error);
+
+        *message = calloc(strlen(error_msg) + 1, sizeof(char));
+        strcpy(*message, error_msg);
+
+        response_h->content_length = strlen(*message);
+        get_status_code_s(status, error);
+        response_h->status = calloc(strlen(status) + 1, sizeof(char));
+        strcpy(response_h->status, status);
+        response_h->connection = request_h->connection;
+        response_h->content_type = malloc(sizeof("text/html"));
+        strcpy(response_h->content_type, "text/html");
+    }
 }
