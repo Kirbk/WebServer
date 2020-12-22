@@ -23,13 +23,14 @@ typedef struct {
 
 typedef struct {
     connection_type connection;
-    method_type allow[9]; // GET, HEAD (Method Not Found Error)
+    char* allowed;
     char* date; // Must be included for http standard.
     char* status; // 200 OK
     char* content_type; // text/html; charset=utf-8
     char* location; // Redirection
     char* cookie;
     char* download_file;
+    char* content_location;
 
     struct {
         int timeout;

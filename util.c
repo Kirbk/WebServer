@@ -71,7 +71,7 @@ int send_timeout(int sockfd) {
 }
 
 int check_permission(char* file_path) {
-    return 0; // Obviously temporary, check against config
+    return 1; // Obviously temporary, check against config
 }
 
 int get_resource_h(FILE ** goal, char * file_name, char * search_location) {
@@ -97,15 +97,9 @@ int get_resource_h(FILE ** goal, char * file_name, char * search_location) {
     return 0;
 }
 
-int get_resource(char** message, char * post_data, http_request_header* request_h, http_response_header* response_h, int * is_php) {
-    if (message == NULL || request_h == NULL ||
-        response_h == NULL || is_php == NULL) return INTERNAL_SERVER_ERROR_S;
-         
-    *is_php = 0;
+char * get_absolute_location(char * requested) {
+    char * resource = calloc(strlen(requested) + MAX_DEFAULT_FILE_INDEX, sizeof(char));
 
-    char resource[strlen(request_h->resource) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
-    memset(resource, 0, sizeof(resource));
-    
     option_setting_pair* home_dir;
     if ((home_dir = get_option("HomeDir")) != NULL) {
         strcpy(resource, home_dir->settings[0]);
@@ -113,7 +107,7 @@ int get_resource(char** message, char * post_data, http_request_header* request_
         strcpy(resource, ".");
     }
 
-    strcat(resource, request_h->resource); // Make copy to destroy with tokenizing
+    strcat(resource, requested); // Make copy to destroy with tokenizing
 
     char* last_i = strrchr(resource, '/');
     if (last_i == NULL || *(last_i + 1) == '\0' || strrchr(last_i, '.') == NULL) {
@@ -139,6 +133,18 @@ int get_resource(char** message, char * post_data, http_request_header* request_
 
         get_data_present = 0;
     }
+
+    return resource;
+}
+
+int get_resource(char** message, char * post_data, http_request_header* request_h, http_response_header* response_h, int * is_php) {
+    if (message == NULL || request_h == NULL ||
+        response_h == NULL || is_php == NULL) return INTERNAL_SERVER_ERROR_S;
+         
+    *is_php = 0;
+
+    // char resource[strlen(request_h->resource) + MAX_DEFAULT_FILE_INDEX]; // Plenty of room for default file index
+    char * resource = get_absolute_location(request_h->resource);
 
     int get = 0;
     char * get_string = NULL;
@@ -210,6 +216,8 @@ int get_resource(char** message, char * post_data, http_request_header* request_
             *message = malloc(size);
             fread(*message, 1, size, serve);
         }
+
+        free(resource);
     }
     else if (serve == NULL) {
         response_h->content_length = 9;

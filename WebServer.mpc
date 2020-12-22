@@ -18,5 +18,11 @@ project (ws) {
     util.c
     get.c
     post.c
+    put.c
+    delete.c
+    connect.c
+    options.c
+    trace.c
+    patch.c
   }
 }

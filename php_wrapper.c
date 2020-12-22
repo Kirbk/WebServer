@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/select.h>
+#include <signal.h>
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
@@ -118,9 +120,10 @@ char ** create_environment(char * file_name, char * q_string, http_request_heade
     char request_method[request_method_length];
     sprintf(request_method, "REQUEST_METHOD=%s", method_type_strings[header->method]);
 
-    int script_uri_length = strlen(header->host) + strlen(header->resource) + 32;
+    int script_uri_length = strlen(header->resource) + 32;
+    if (header->host) script_uri_length += strlen(header->host);
     char script_uri[script_uri_length];
-    sprintf(script_uri, "SCRIPT_URI=%s%.*s", header->host, (int)strcspn(header->resource, "?"), header->resource);
+    sprintf(script_uri, "SCRIPT_URI=%s%.*s", (header->host) ? header->host : "", (int)strcspn(header->resource, "?"), header->resource);
 
     char * s_fn = file_name;
 

@@ -8,16 +8,17 @@
 
 http_response_header create_http_response_header() {
     http_response_header head = { CLOSE, 
-                                { INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID, INVALID },
-                                NULL, // Automatically set DATE field
-                                NULL,
-                                NULL,
-                                NULL,
-                                NULL,
-                                NULL,
-                                { 5, 100 },
-                                -1, 
-                                -1 };
+                                  NULL,
+                                  NULL, // Automatically set DATE field
+                                  NULL,
+                                  NULL,
+                                  NULL,
+                                  NULL,
+                                  NULL,
+                                  NULL,
+                                  { 5, 100 },
+                                  -1, 
+                                  -1 };
 
     return head;
 }
@@ -538,6 +539,12 @@ int construct_response_header(char** header_text, http_response_header* h, int i
     
     if (h->download_file)
         add_line_c(3, craft, "Content-Disposition: attachment; filename=\"", h->download_file, "\"");
+
+    if (h->content_location)
+        add_line_c(2, craft, "Content-Location: ", h->download_file);
+
+    if (h->allowed)
+        add_line_c(2, craft, "Allow: ", h->allowed);
 
     if (h->content_length > 0) {
         char len[10];

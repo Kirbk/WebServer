@@ -17,6 +17,12 @@
 #include "util.h"
 #include "get.h"
 #include "post.h"
+#include "put.h"
+#include "delete.h"
+#include "connect.h"
+#include "options.h"
+#include "trace.h"
+#include "patch.h"
 
 int dispatch(int sockfd, char* clientip) {
     int loop = 1;
@@ -53,6 +59,7 @@ int dispatch(int sockfd, char* clientip) {
 
         int buf_ind = 0;
         int cont = 1;
+        int kill = 0;
         while (cont) {
             while (buf_ind < MAX_HEADER_LENGTH && 1 == read(sockfd, &buffer[buf_ind], 1)) {
                 if (buf_ind > 2                 && 
@@ -65,9 +72,18 @@ int dispatch(int sockfd, char* clientip) {
                     break;
                 }
                 buf_ind++;
+
+                if (select(sockfd + 1, &read_fds, &write_fds, &except_fds, &timeout) != 1) {
+                    send_timeout(sockfd);
+                    cont = 0;
+                    kill = 1;
+                    reason = "Time Out";
+                    break;
+                }
             }
 
             buf_ind++;
+
 
             if (req_header_text == NULL) {
                 req_header_text = (char*)malloc(buf_ind * sizeof(char) + 1);
@@ -83,6 +99,8 @@ int dispatch(int sockfd, char* clientip) {
 
             memset(buffer, 0, MAX_HEADER_LENGTH);
         }
+
+        if (kill) break;
 
         log_file = fopen("log.txt", "a");
         fwrite("\n----------------------------------------------------------------------------------------------------\n", 102, 1, log_file);
@@ -139,22 +157,22 @@ int dispatch(int sockfd, char* clientip) {
             ret = post_m(&message, request, &response, &php);
             break;
         case PUT:
-            info("PUT");
+            ret = put_m(&message, request, &response);
             break;
         case DELETE:
-            info("DELETE");
+            ret = delete_m(&message, request, &response);
             break;
         case CONNECT:
-            info("CONNECT");
+            ret = connect_m(&message, request, &response);
             break;
         case OPTIONS:
-            info("OPTIONS");
+            ret = options_m(&message, request, &response);
             break;
         case TRACE:
-            info("TRACE");
+            ret = trace_m(&message, request, &response);
             break;
         case PATCH:
-            info("PATCH");
+            ret = patch_m(&message, request, &response);
             break;
         case INVALID:
             send500(sockfd);

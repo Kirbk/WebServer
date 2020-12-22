@@ -1,6 +1,6 @@
 <html>
 <body>
-<?php 
+<?php
 
 echo "GET variables: "; var_dump($_GET); echo "<br>";
 echo "POST variables: "; var_dump($_POST); echo "<br>";

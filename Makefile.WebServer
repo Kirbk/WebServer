@@ -6,17 +6,17 @@ CXX           = g++
 LD            = $(CXX) $(CCFLAGS) $(CPPFLAGS)
 AR            = ar
 PICFLAGS      = -fPIC
-CPPFLAGS      = $(PICFLAGS) $(GENFLAGS) -g -D_REENTRANT
+CPPFLAGS      = $(PICFLAGS) $(GENFLAGS) -D_REENTRANT
 OBJEXT        = .o
 OUTPUT_OPTION = -o "$@"
 COMPILE.c     = $(CC) $(CFLAGS) $(CPPFLAGS) -c
 COMPILE.cc    = $(CXX) $(CCFLAGS) $(CPPFLAGS) -c
 LDFLAGS       = -L"."
 CCC           = $(CXX)
-MAKEFILE      = Makefile.ws
+MAKEFILE      = Makefile.WebServer
 DEPENDENCIES  = .depend.$(MAKEFILE)
 BTARGETDIR    = ./
-BIN           = $(BTARGETDIR)ws$(EXESUFFIX)$(EXEEXT)
+BIN           = $(BTARGETDIR)main$(EXESUFFIX)$(EXEEXT)
 CAT           = cat
 MV            = mv -f
 RM            = rm -rf
@@ -29,10 +29,10 @@ TOUCH         = touch
 EXEEXT        = 
 LIBPREFIX     = lib
 LIBSUFFIX     = 
-GENFLAGS      = 
+GENFLAGS      = -O
 LDLIBS        = -ldl $(subst lib,-l,$(sort $(basename $(notdir $(wildcard /usr/lib/librt.so /lib/librt.so))))) -lpthread
-OBJS          = client$(OBJEXT) config$(OBJEXT) host$(OBJEXT) http_header$(OBJEXT) log$(OBJEXT) php_wrapper$(OBJEXT) util$(OBJEXT) get$(OBJEXT) post$(OBJEXT) put$(OBJEXT) delete$(OBJEXT) connect$(OBJEXT) options$(OBJEXT) trace$(OBJEXT) patch$(OBJEXT)
-SRC           = client.c config.c host.c http_header.c log.c php_wrapper.c util.c get.c post.c put.c delete.c connect.c options.c trace.c patch.c
+OBJS          = http_header$(OBJEXT) post$(OBJEXT) main$(OBJEXT) client$(OBJEXT) config$(OBJEXT) util$(OBJEXT) get$(OBJEXT) tests$(OBJEXT) host$(OBJEXT) log$(OBJEXT) php_wrapper$(OBJEXT) put$(OBJEXT)
+SRC           = http_header.c post.c main.c client.c config.c util.c get.c tests.c host.c log.c php_wrapper.c put.c
 LINK.cc       = $(LD) $(LDFLAGS)
 EXPORTFLAGS   = 
 DEPLIBS       = $(foreach lib, , $(foreach libpath, ., $(wildcard $(libpath)/lib$(lib).a)))
@@ -50,23 +50,20 @@ $(BIN): $(OBJS) $(DEPLIBS)
 generated: $(GENERATED_DIRTY)
 	@-:
 
+http_header$(OBJEXT): http_header.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) http_header.c
+
+post$(OBJEXT): post.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) post.c
+
+main$(OBJEXT): main.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) main.c
+
 client$(OBJEXT): client.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) client.c
 
 config$(OBJEXT): config.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) config.c
-
-host$(OBJEXT): host.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) host.c
-
-http_header$(OBJEXT): http_header.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) http_header.c
-
-log$(OBJEXT): log.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) log.c
-
-php_wrapper$(OBJEXT): php_wrapper.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) php_wrapper.c
 
 util$(OBJEXT): util.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) util.c
@@ -74,26 +71,20 @@ util$(OBJEXT): util.c
 get$(OBJEXT): get.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) get.c
 
-post$(OBJEXT): post.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) post.c
+tests$(OBJEXT): tests.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) tests.c
+
+host$(OBJEXT): host.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) host.c
+
+log$(OBJEXT): log.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) log.c
+
+php_wrapper$(OBJEXT): php_wrapper.c
+	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) php_wrapper.c
 
 put$(OBJEXT): put.c
 	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) put.c
-
-delete$(OBJEXT): delete.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) delete.c
-
-connect$(OBJEXT): connect.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) connect.c
-
-options$(OBJEXT): options.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) options.c
-
-trace$(OBJEXT): trace.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) trace.c
-
-patch$(OBJEXT): patch.c
-	$(COMPILE.c) $(EXPORTFLAGS) $(OUTPUT_OPTION) patch.c
 
 clean:
 	-$(RM) $(OBJS)
